@@ -5,6 +5,9 @@
 #include <cstring>
 #include <stdexcept>
 
+#include "WindowManager.h"
+#include "Input.h"
+
 const uint32_t default_width  = 960;
 const uint32_t default_height = 540;
 
@@ -21,6 +24,6 @@ public:
 	void Frame();
 
 private:
-
+	DWindowManager * windowManager = nullptr;
 };
 
