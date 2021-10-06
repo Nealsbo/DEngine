@@ -18,15 +18,19 @@ void DEngine::Init() {
     Log::Msg("Engine Init", LOG_LEVEL::INFO);
 
     windowManager = new DWindowManager();
+	renderer      = new DRenderEngine();
 
     windowManager->Init();
+	renderer->Init();
 }
 
 void DEngine::Shutdown() {
     Log::Msg("Engine Shutdown", LOG_LEVEL::INFO);
 
+	renderer->Shutdown();
     windowManager->ShutDown();
 
+	delete renderer;
     delete windowManager;
 }
 
@@ -48,11 +52,11 @@ void DEngine::Frame() {
 	// scene->Update(deltaFrameTime);
 
     // Render update
-	// renderer->Render();
+	renderer->Render();
 	
 	windowManager->SwapBuffers();
 
 	if (isOnExitRequest) {
-		printf("%i, %f, %f, %f\n", frameCount, totalTime, deltaFrameTime, totalTime / (float)count);
+		printf("%i, %f, %f, %f\n", frameCount, totalTime, deltaFrameTime, totalTime / (float)frameCount);
 	}
 }

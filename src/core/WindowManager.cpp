@@ -25,8 +25,20 @@ GLFWwindow* DWindowManager::GetWindow() {
 
 int DWindowManager::InitGL() {
 	int width, height;
+	int result; 
 
-	glfwInit();
+	const char* description;
+
+	result = glfwInit();
+    if(!result) {
+        printf("Failed to init GLFW: %i\n", result);
+        int code = glfwGetError(&description);
+ 
+        if (description)
+            printf("%i | %s", code, description);
+        return -1;
+    }
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -52,7 +64,7 @@ int DWindowManager::InitGL() {
 
 	glfwGetWindowSize(window, &width, &height);
 	glViewport(0, 0, width, height);
-
+	
 	return 0;
 }
 

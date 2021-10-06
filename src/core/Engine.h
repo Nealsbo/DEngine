@@ -7,6 +7,7 @@
 
 #include "WindowManager.h"
 #include "Input.h"
+#include "../renderer/RenderEngine.h"
 
 const uint32_t default_width  = 960;
 const uint32_t default_height = 540;
@@ -25,5 +26,6 @@ public:
 
 private:
 	DWindowManager * windowManager = nullptr;
+	DRenderEngine *  renderer      = nullptr;
 };
 
