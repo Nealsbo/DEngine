@@ -26,6 +26,7 @@ public:
 
 private:
 	DWindowManager * windowManager = nullptr;
+	DInputHandler *  input         = nullptr;
 	DRenderEngine *  renderer      = nullptr;
 };
 

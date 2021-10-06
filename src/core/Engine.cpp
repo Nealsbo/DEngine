@@ -18,9 +18,11 @@ void DEngine::Init() {
     Log::Msg("Engine Init", LOG_LEVEL::INFO);
 
     windowManager = new DWindowManager();
+	input         = new DInputHandler();
 	renderer      = new DRenderEngine();
 
     windowManager->Init();
+	input->Init(windowManager->GetWindow());
 	renderer->Init();
 }
 
@@ -31,6 +33,7 @@ void DEngine::Shutdown() {
     windowManager->ShutDown();
 
 	delete renderer;
+	delete input;
     delete windowManager;
 }
 
@@ -45,7 +48,7 @@ void DEngine::Frame() {
 
 	// TODO: Implementation
 	// Handle input
-	// input->Update();
+	input->Update();
 
 	// Handle commands and events
 	// Game process update
@@ -57,6 +60,7 @@ void DEngine::Frame() {
 	windowManager->SwapBuffers();
 
 	if (isOnExitRequest) {
-		printf("%i, %f, %f, %f\n", frameCount, totalTime, deltaFrameTime, totalTime / (float)frameCount);
+		printf("Engine frame count: %i\nConsumed time: %f\nAverage FPS: %f\n", 
+			frameCount, totalTime, (float)frameCount / totalTime);
 	}
 }
