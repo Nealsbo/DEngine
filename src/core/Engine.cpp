@@ -19,10 +19,12 @@ void DEngine::Init() {
 
     windowManager = new DWindowManager();
 	input         = new DInputHandler();
+	console       = new DConsole();
 	renderer      = new DRenderEngine();
 
     windowManager->Init();
 	input->Init(windowManager->GetWindow());
+	console->Init();
 	renderer->Init();
 }
 
@@ -30,9 +32,12 @@ void DEngine::Shutdown() {
     Log::Msg("Engine Shutdown", LOG_LEVEL::INFO);
 
 	renderer->Shutdown();
+	console->Shutdown();
     windowManager->ShutDown();
 
+	// TODO: Remove deletion/Rework init
 	delete renderer;
+	delete console;
 	delete input;
     delete windowManager;
 }

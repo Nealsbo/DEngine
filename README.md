@@ -6,7 +6,7 @@ TO DO
 
 # Building
 ## Dependecies
-List of required and used 3rd party libs or software.
+List of used 3rd party libs.
 
 Deps:
 - GLFW
@@ -14,7 +14,6 @@ Deps:
 - TO DO
 
 ## Build process
-
 ### Windows
 TO DO
 

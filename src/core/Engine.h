@@ -6,6 +6,7 @@
 #include <stdexcept>
 
 #include "WindowManager.h"
+#include "Console.h"
 #include "Input.h"
 #include "../renderer/RenderEngine.h"
 
@@ -27,6 +28,7 @@ public:
 private:
 	DWindowManager * windowManager = nullptr;
 	DInputHandler *  input         = nullptr;
+	DConsole *       console       = nullptr;
 	DRenderEngine *  renderer      = nullptr;
 };
 

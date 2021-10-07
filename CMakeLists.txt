@@ -36,6 +36,7 @@ target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 set(src_core
 	src/main.cpp
 	src/core/Engine.cpp
+    src/core/Console.cpp
     src/core/Input.cpp
 	src/core/Logger.cpp
 	src/core/WindowManager.cpp
