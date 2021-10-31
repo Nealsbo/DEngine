@@ -54,6 +54,10 @@ void DEngine::Frame() {
 	// TODO: Implementation
 	// Handle input
 	input->Update();
+	
+	if (input->IsKeyDown(GLFW_KEY_ESCAPE)) {
+		isOnExitRequest = true;
+	}
 
 	// Handle commands and events
 	// Game process update

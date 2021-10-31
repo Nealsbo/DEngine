@@ -41,6 +41,7 @@ set(src_core
 	src/core/Logger.cpp
 	src/core/WindowManager.cpp
     src/renderer/RenderEngine.cpp
+#    src/renderer/Quad.cpp
 )
 
 include_directories("src/core")

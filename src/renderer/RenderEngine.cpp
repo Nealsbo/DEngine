@@ -1,13 +1,13 @@
 #include "RenderEngine.h"
 
-const char* minVertexShaderSource = "#version 330 core\n"
+const char* minVertexShaderSource = "#version 400 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "void main()\n"
 "{\n"
 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
 "}\0";
 
-const char* minFragmentShaderSource = "#version 330 core\n"
+const char* minFragmentShaderSource = "#version 400 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
@@ -28,7 +28,7 @@ void DRenderEngine::Init() {
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        printf("ERROR:Render: Vertex shader compilation failed: \\%s\n", infoLog);
+        printf("ERROR: Render: Vertex shader compilation failed: \\%s\n", infoLog);
     }
 
     unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -38,7 +38,7 @@ void DRenderEngine::Init() {
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success) {
         glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        printf("ERROR:Render: Fragment shader compilation failed: \\%s\n", infoLog);
+        printf("ERROR: Render: Fragment shader compilation failed: \\%s\n", infoLog);
     }
 
     unsigned int shaderProgram = glCreateProgram();

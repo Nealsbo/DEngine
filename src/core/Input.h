@@ -10,6 +10,8 @@ public:
     void Init(GLFWwindow* window);
     void Update();
 
+    bool IsKeyDown(int key);
+
 private:
     GLFWwindow * window = nullptr;
 };
