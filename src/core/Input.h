@@ -8,6 +8,7 @@ public:
     ~DInputHandler();
 
     void Init(GLFWwindow* window);
+    void Shutdown();
     void Update();
 
     bool IsKeyDown(int key);

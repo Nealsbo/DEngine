@@ -8,6 +8,7 @@
 #include "WindowManager.h"
 #include "Console.h"
 #include "Input.h"
+#include "Session.h"
 #include "../renderer/RenderEngine.h"
 
 const uint32_t default_width  = 960;
@@ -30,5 +31,6 @@ private:
 	DInputHandler *  input         = nullptr;
 	DConsole *       console       = nullptr;
 	DRenderEngine *  renderer      = nullptr;
+	DSession *       session       = nullptr;
 };
 

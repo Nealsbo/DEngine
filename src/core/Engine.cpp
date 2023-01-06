@@ -21,21 +21,26 @@ void DEngine::Init() {
 	input         = new DInputHandler();
 	console       = new DConsole();
 	renderer      = new DRenderEngine();
+	session       = new DSession();
 
     windowManager->Init();
 	input->Init(windowManager->GetWindow());
 	console->Init();
 	renderer->Init();
+	session->Init();
 }
 
 void DEngine::Shutdown() {
     Log::Msg("Engine Shutdown", LOG_LEVEL::INFO);
 
+	session->Shutdown();
 	renderer->Shutdown();
 	console->Shutdown();
+	input->Shutdown();
     windowManager->ShutDown();
 
 	// TODO: Remove deletion/Rework init
+	delete session;
 	delete renderer;
 	delete console;
 	delete input;
@@ -55,13 +60,11 @@ void DEngine::Frame() {
 	// Handle input
 	input->Update();
 	
-	if (input->IsKeyDown(GLFW_KEY_ESCAPE)) {
-		isOnExitRequest = true;
-	}
-
 	// Handle commands and events
+	//eventProcess();
+
 	// Game process update
-	// scene->Update(deltaFrameTime);
+	session->Frame();
 
     // Render update
 	renderer->Render();

@@ -39,9 +39,13 @@ set(src_core
     src/core/Console.cpp
     src/core/Input.cpp
 	src/core/Logger.cpp
+    src/core/Session.cpp
 	src/core/WindowManager.cpp
     src/renderer/RenderEngine.cpp
-#    src/renderer/Quad.cpp
+    #src/renderer/Texture.cpp
+    #src/renderer/Text.cpp
+    #src/renderer/Shader.cpp
+    #src/renderer/Quad.cpp
 )
 
 include_directories("src/core")
