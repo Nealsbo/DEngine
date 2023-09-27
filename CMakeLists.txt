@@ -34,17 +34,20 @@ target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
 #target_include_directories(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/include")
 
 set(src_core
-	src/main.cpp
-	src/core/Engine.cpp
+    src/main.cpp
+    src/core/Engine.cpp
     src/core/Console.cpp
     src/core/Input.cpp
-	src/core/Logger.cpp
+    src/core/Logger.cpp
     src/core/Session.cpp
-	src/core/WindowManager.cpp
+    src/core/WindowManager.cpp
+    src/core/Camera.cpp
+
     src/renderer/RenderEngine.cpp
-    #src/renderer/Texture.cpp
-    #src/renderer/Text.cpp
-    #src/renderer/Shader.cpp
+    src/renderer/Texture.cpp
+    src/renderer/Shader.cpp
+    src/renderer/Mesh.cpp
+    src/renderer/Model.cpp
     #src/renderer/Quad.cpp
 )
 

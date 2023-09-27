@@ -1,22 +1,33 @@
 #pragma once
 
 #include "../core/WindowManager.h"
+#include "../core/Camera.h"
 
+#include "Shader.h"
 class DRenderEngine {
 public:
 	DRenderEngine();
 	~DRenderEngine();
 
-	void Init();
+	void Init(DWindowManager * wm);
 	void Shutdown();
 
-	void Render();
+	void Draw(DCamera &camera);
 
-	int num_quads;
+	void SetModel();
+
+	void SetMesh();
+	void SetTexture();
+	void SetShader();
+
+private:
+	DWindowManager * win;
+
 	unsigned int VBO, VAO;
-	unsigned int shaderProgram;
-	char buffer[99999];
+	DShader *shader;
 
+	char buffer[99999];
 	char text[16] = "helloworld";
+
 };
 

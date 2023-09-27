@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "Logger.h"
 
+
 extern bool isOnExitRequest;
 
 int   frameCount     = 0;
@@ -9,6 +10,7 @@ float currFrameTime  = 0.0f;
 float lastFrameTime  = 0.0f;
 float deltaFrameTime = 0.0f;
 float totalTime      = 0.0f;
+
 
 void DEngine::PreInit(int argc, char** argv) {
     Log::Msg("Engine PreInit", LOG_LEVEL::INFO);
@@ -26,17 +28,19 @@ void DEngine::Init() {
     windowManager->Init();
 	input->Init(windowManager->GetWindow());
 	console->Init();
-	renderer->Init();
+	renderer->Init(windowManager);
 	session->Init();
+
+	lastFrameTime = (float)glfwGetTime();
 }
 
 void DEngine::Shutdown() {
     Log::Msg("Engine Shutdown", LOG_LEVEL::INFO);
 
 	session->Shutdown();
+	input->Shutdown();
 	renderer->Shutdown();
 	console->Shutdown();
-	input->Shutdown();
     windowManager->ShutDown();
 
 	// TODO: Remove deletion/Rework init
@@ -45,6 +49,9 @@ void DEngine::Shutdown() {
 	delete console;
 	delete input;
     delete windowManager;
+
+	printf("Engine stats:\nFrame count: %i\nConsumed time: %f\nAverage FPS: %f\n", 
+		frameCount, totalTime, (float)frameCount / totalTime);
 }
 
 void DEngine::Frame() {
@@ -56,23 +63,29 @@ void DEngine::Frame() {
 	lastFrameTime  = currFrameTime;
 	totalTime     += deltaFrameTime;
 
-	// TODO: Implementation
-	// Handle input
-	input->Update();
-	
 	// Handle commands and events
 	//eventProcess();
 
+	// TODO: Implementation
+
+	// Handle input
+	input->Update();
+	
 	// Game process update
-	session->Frame();
+	// TODO Move update to dedicated instance
+	//session->Frame();
+	SceneUpdate(deltaFrameTime);
 
     // Render update
-	renderer->Render();
-	
-	windowManager->SwapBuffers();
+	renderer->Draw(mainCamera);
+}
 
-	if (isOnExitRequest) {
-		printf("Engine frame count: %i\nConsumed time: %f\nAverage FPS: %f\n", 
-			frameCount, totalTime, (float)frameCount / totalTime);
-	}
+void DEngine::SceneUpdate(float delta) {
+	glm::vec2 mousexy = windowManager->GetMousePos();
+	//glfwGetCursorPos(windowManager->GetWindow(), &xpos, &ypos);
+	mainCamera.ProcessMouse(mousexy.x, mousexy.y, true);
+}
+
+void DEngine::LoadModels() {
+
 }
