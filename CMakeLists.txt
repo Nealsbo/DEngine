@@ -25,7 +25,8 @@ endif()
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
-include_directories(${GLFW_INCLUDE_DIRS})
+find_package(SDL2 REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
 
 # Build glad
 set(GLAD_DIR "${EXT_DIR}/glad")
@@ -60,7 +61,7 @@ add_executable(${CMAKE_PROJECT_NAME} ${src_core})
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
     dl
-    glfw
+    SDL2::SDL2
     "glad"
     OpenGL::GL
 )

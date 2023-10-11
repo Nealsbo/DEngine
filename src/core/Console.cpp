@@ -8,8 +8,8 @@ DConsole::~DConsole() {
 
 }
 
-void DConsole::Init() {
-
+int DConsole::Init() {
+    return 0;
 }
 
 void DConsole::Shutdown() {

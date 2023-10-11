@@ -8,8 +8,8 @@ DSession::~DSession() {
 
 }
 
-void DSession::Init() {
-
+int DSession::Init() {
+    return 0;
 }
 
 void DSession::Shutdown() {

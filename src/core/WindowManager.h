@@ -4,7 +4,8 @@
 #include <iostream>
 
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
+#include <SDL2/SDL.h>
 
 #include <glm/glm.hpp>
 
@@ -14,13 +15,13 @@ public:
 	~DWindowManager();
 
 	int  Init();
-	void ShutDown();
+	void Shutdown();
 
 	void SwapBuffers();
 	glm::vec2 GetMousePos();
 	float GetMouseScroll();
 
-	GLFWwindow* GetWindow();
+	SDL_Window* GetWindow();
 
 private:
 	int InitGL();
@@ -28,9 +29,12 @@ private:
 	uint32_t screenWidth = 1280;
 	uint32_t screenHeight = 720;
 	
-	GLFWwindow *window = nullptr;
+	SDL_Window *window;
+	SDL_GLContext glContext;
 };
 
+/*
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn);
 void scroll_callback(GLFWwindow* window, double xoffsets, double yoffsets);
+*/

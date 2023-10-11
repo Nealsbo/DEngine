@@ -6,10 +6,10 @@ extern bool isOnExitRequest;
 
 int   frameCount     = 0;
 
-float currFrameTime  = 0.0f;
-float lastFrameTime  = 0.0f;
-float deltaFrameTime = 0.0f;
-float totalTime      = 0.0f;
+Uint64 currFrameCounter = 0;
+Uint64 lastFrameCounter = 0;
+float deltaTime         = 0.0f;
+float totalTime         = 0.0f;
 
 
 void DEngine::PreInit(int argc, char** argv) {
@@ -19,49 +19,87 @@ void DEngine::PreInit(int argc, char** argv) {
 void DEngine::Init() {
     Log::Msg("Engine Init", LOG_LEVEL::INFO);
 
+	int result;
+
     windowManager = new DWindowManager();
 	input         = new DInputHandler();
 	console       = new DConsole();
 	renderer      = new DRenderEngine();
 	session       = new DSession();
 
-    windowManager->Init();
-	input->Init(windowManager->GetWindow());
-	console->Init();
-	renderer->Init(windowManager);
-	session->Init();
+    result = windowManager->Init();
+	if(result) {
+		Log::Msg("WindowManager init failed", LOG_LEVEL::ERROR);
+		Shutdown();
+	}
 
-	lastFrameTime = (float)glfwGetTime();
+	result = input->Init(windowManager->GetWindow());
+	if(result) {
+		Log::Msg("InputHandler init failed", LOG_LEVEL::ERROR);
+		Shutdown();
+	}
+
+	result = console->Init();
+	if(result) {
+		Log::Msg("Console init failed", LOG_LEVEL::ERROR);
+		Shutdown();
+	}
+
+	result = renderer->Init(windowManager);
+	if(result) {
+		Log::Msg("Renderer init failed", LOG_LEVEL::ERROR);
+		Shutdown();
+	}
+
+	result = session->Init();
+	if(result) {
+		Log::Msg("GameSession init failed", LOG_LEVEL::ERROR);
+		Shutdown();
+	}
+
+	lastFrameCounter = SDL_GetPerformanceCounter();
+	currFrameCounter = lastFrameCounter;
 }
 
 void DEngine::Shutdown() {
     Log::Msg("Engine Shutdown", LOG_LEVEL::INFO);
 
-	session->Shutdown();
-	input->Shutdown();
-	renderer->Shutdown();
-	console->Shutdown();
-    windowManager->ShutDown();
-
-	// TODO: Remove deletion/Rework init
-	delete session;
-	delete renderer;
-	delete console;
-	delete input;
-    delete windowManager;
+	if(session) {
+		session->Shutdown();
+		delete session;
+	}
+	
+	if(input) {
+		input->Shutdown();
+		delete input;
+	}
+	
+	if(renderer) {
+		renderer->Shutdown();
+		delete renderer;
+	}
+	
+	if(console) {
+		console->Shutdown();
+		delete console;
+	}
+	
+	if(windowManager) {
+		windowManager->Shutdown();
+    	delete windowManager;
+	}
 
 	printf("Engine stats:\nFrame count: %i\nConsumed time: %f\nAverage FPS: %f\n", 
-		frameCount, totalTime, (float)frameCount / totalTime);
+		frameCount, totalTime / 1000.0f, (float)frameCount / (totalTime / 1000.0f));
 }
 
 void DEngine::Frame() {
     frameCount++;
 
-	// Calc timestamp and delta
-	currFrameTime  = (float)glfwGetTime();
-	deltaFrameTime = currFrameTime - lastFrameTime;
-	lastFrameTime  = currFrameTime;
-	totalTime     += deltaFrameTime;
+	lastFrameCounter = currFrameCounter;
+	currFrameCounter = SDL_GetPerformanceCounter();
+	deltaTime = (float)((currFrameCounter - lastFrameCounter) * 1000 / (float)SDL_GetPerformanceFrequency());
+	totalTime += deltaTime;
 
 	// Handle commands and events
 	//eventProcess();
@@ -74,7 +112,7 @@ void DEngine::Frame() {
 	// Game process update
 	// TODO Move update to dedicated instance
 	//session->Frame();
-	SceneUpdate(deltaFrameTime);
+	SceneUpdate(deltaTime);
 
     // Render update
 	renderer->Draw(mainCamera);

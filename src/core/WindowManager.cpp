@@ -18,15 +18,15 @@ int DWindowManager::Init() {
 	return 0;
 }
 
-void DWindowManager::ShutDown() {
-	glfwTerminate();
+void DWindowManager::Shutdown() {
+	SDL_Quit();
 }
 
 void DWindowManager::SwapBuffers() {
-	glfwSwapBuffers(window);
+	SDL_GL_SwapWindow(window);
 }
 
-GLFWwindow* DWindowManager::GetWindow() {
+SDL_Window* DWindowManager::GetWindow() {
 	return window;
 }
 
@@ -42,50 +42,59 @@ int DWindowManager::InitGL() {
 	int width, height;
 	int result; 
 
-	const char* description;
+	const char* description = NULL;
 
-	result = glfwInit();
-    if(!result) {
-        printf("Failed to init GLFW: %i\n", result);
-        int code = glfwGetError(&description);
- 
+	result = SDL_Init(SDL_INIT_VIDEO);
+    if(result < 0) {
+        printf("Failed to init SDL: %i\n", result);
+        description = SDL_GetError();
         if (description)
-            printf("%i | %s", code, description);
+            printf("%i | %s", result, description);
+		return -1;
+    }
+
+	window = SDL_CreateWindow("SDL App", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+    if (window == NULL) {
+        printf("ERROR: Failed to create SDL window\n");
+        SDL_Quit();
         return -1;
     }
 
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 4 );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 0 );
+    SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-	window = glfwCreateWindow(screenWidth, screenHeight, "OpenGL Renderer", NULL, NULL);
-	if (window == NULL) {
-		printf("ERROR: Failed to create GLFW window\n");
-		glfwTerminate();
-		return -1;
-	}
+	SDL_GL_SetSwapInterval(1);
 
-	glfwMakeContextCurrent(window);
+	glContext = SDL_GL_CreateContext( window );
+    if( glContext == NULL ) {
+        printf( "OpenGL context could not be created! SDL Error: %s\n", SDL_GetError() );
+    }
 
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetScrollCallback(window, scroll_callback);
+	// todo window resize sdl
+	//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+	if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
 		printf("ERROR: Failed to initialize GLAD\n");
-		return -1;
+        SDL_GL_DeleteContext(glContext);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return -1;
 	}
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_BLEND);
 
-	glfwGetWindowSize(window, &width, &height);
+	width = screenWidth;
+	height = screenHeight;
 	glViewport(0, 0, width, height);
 	
 	return 0;
 }
 
+/*
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 }
@@ -113,3 +122,4 @@ void scroll_callback(GLFWwindow* window, double xoffsets, double yoffsets)
 {
     scrollOffset = yoffsets;
 }
+*/

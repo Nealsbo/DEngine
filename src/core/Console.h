@@ -11,7 +11,7 @@ public:
     DConsole();
     ~DConsole();
 
-    void Init();
+    int Init();
     void Shutdown();
 
     void Open();

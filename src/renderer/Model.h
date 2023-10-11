@@ -4,6 +4,7 @@
 
 #include "Mesh.h"
 #include "Shader.h"
+#include "Texture.h"
 
 
 class DModel {
@@ -27,4 +28,5 @@ private:
 
     DShader * shader;
     DMesh * mesh;
+    DTexture * texture;
 };

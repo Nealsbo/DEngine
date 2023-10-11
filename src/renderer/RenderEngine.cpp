@@ -1,5 +1,23 @@
 #include "RenderEngine.h"
 
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+
+// #define TINYGLTF_NOEXCEPTION // optional. disable exception handling.
+#include "../../ext/tiny_gltf.h"
+
+//#include "../../ext/stb_image.h"
+//#include "../../ext/stb_image_write.h"
+//#include "../../ext/json.hpp"
+
+using namespace tinygltf;
+
+Model model;
+TinyGLTF loader;
+std::string err;
+std::string warn;
+
 const char* minVertexShaderSource = "#version 400 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "void main()\n"
@@ -18,7 +36,7 @@ DRenderEngine::DRenderEngine() {}
 
 DRenderEngine::~DRenderEngine() {}
 
-void DRenderEngine::Init(DWindowManager * wm) {
+int DRenderEngine::Init(DWindowManager * wm) {
     win = wm;
 
     shader = new DShader("../assets/base.vs", "../assets/base.fs");
@@ -43,6 +61,7 @@ void DRenderEngine::Init(DWindowManager * wm) {
 
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    return 0;
 }
 
 void DRenderEngine::Shutdown() {
@@ -86,4 +105,20 @@ void DRenderEngine::SetTexture() {
 
 void DRenderEngine::SetShader() {
 
+}
+
+void DRenderEngine::LoadModel()
+{
+    bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, "../assets/glTF/DamagedHelmet.gltf");
+    if (!warn.empty()) {
+        printf("Warn: %s\n", warn.c_str());
+    }
+
+    if (!err.empty()) {
+        printf("Err: %s\n", err.c_str());
+    }
+
+    if (!ret) {
+        printf("Failed to parse glTF\n");
+    }
 }

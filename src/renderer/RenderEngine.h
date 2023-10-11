@@ -4,12 +4,14 @@
 #include "../core/Camera.h"
 
 #include "Shader.h"
+
+#include "../../ext/tiny_gltf.h"
 class DRenderEngine {
 public:
 	DRenderEngine();
 	~DRenderEngine();
 
-	void Init(DWindowManager * wm);
+	int Init(DWindowManager * wm);
 	void Shutdown();
 
 	void Draw(DCamera &camera);
@@ -19,6 +21,8 @@ public:
 	void SetMesh();
 	void SetTexture();
 	void SetShader();
+
+	void LoadModel();
 
 private:
 	DWindowManager * win;

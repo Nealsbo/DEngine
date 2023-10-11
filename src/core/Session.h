@@ -11,7 +11,7 @@ public:
     DSession();
     ~DSession();
 
-    void Init();
+    int Init();
     void Shutdown();
 
     void Frame();
