@@ -2,9 +2,9 @@
 
 #include <glm/glm.hpp>
 
+#include "Texture.h"
 #include "Mesh.h"
 #include "Shader.h"
-#include "Texture.h"
 
 
 class DModel {

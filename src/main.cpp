@@ -14,7 +14,7 @@ void EngineInit(int argc, char ** argv) {
 }
 
 void EngineMainLoop() {
-	while (!isOnExitRequest) {
+	while (engine->IsRunning()) {
 		engine->Frame();
 	}
 

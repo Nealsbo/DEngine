@@ -30,9 +30,7 @@ public:
 
 	void Frame();
 
-	void SceneUpdate(float delta);
-
-	void LoadModels();
+	bool IsRunning();
 
 private:
 	DWindowManager * windowManager = nullptr;
@@ -40,9 +38,8 @@ private:
 	DConsole *       console       = nullptr;
 	DRenderEngine *  renderer      = nullptr;
 	DSession *       session       = nullptr;
+	DScene *         scene         = nullptr;
 
-	//scene objects;
-	DCamera mainCamera;
-	std::vector<DModel> models;
+	bool isRunning = true;
 };
 

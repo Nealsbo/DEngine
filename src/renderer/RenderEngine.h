@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../core/WindowManager.h"
-#include "../core/Camera.h"
+#include "../core/Scene.h"
 
 #include "Shader.h"
 
@@ -14,7 +14,11 @@ public:
 	int Init(DWindowManager * wm);
 	void Shutdown();
 
-	void Draw(DCamera &camera);
+	void DrawFrame(DScene *scene);
+
+	void Draw();
+	void DrawModelNodes(tinygltf::Node& node);
+	void DrawMesh(const std::map<int, GLuint>& ebos, tinygltf::Mesh& mesh);
 
 	void SetModel();
 
@@ -22,16 +26,23 @@ public:
 	void SetTexture();
 	void SetShader();
 
-	void LoadModel();
+	void LoadModel(std::string &fileName);
+	std::pair<unsigned int, std::map<int, unsigned int>> SetupModel(tinygltf::Model &model);
+	void SetupModelNodes(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Node &node);
+	void SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Mesh &mesh);
+
+	void PrintModel(const tinygltf::Model &model);
 
 private:
 	DWindowManager * win;
 
-	unsigned int VBO, VAO;
+	float scale;
+	//std::map<int, GLuint> ebos;
+
+	std::pair<unsigned int, std::map<int, unsigned int>> VAO_and_EBOs;
+  	GLuint vao;
 	DShader *shader;
 
 	char buffer[99999];
 	char text[16] = "helloworld";
-
 };
-

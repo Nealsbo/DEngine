@@ -1,0 +1,175 @@
+
+class DRenderEngine2 {
+public:
+	DRenderEngine2();
+	~DRenderEngine2();
+
+	int  Init();
+	void Shutdown();
+
+	void SetView(DCamera &camera);
+
+
+	void DrawFrame(scene){
+		PreRender{
+			GetCameraMat();
+			Frustrum{
+				vector<model> = allmodels;
+				camera frustrum -> vector<model> visibleModels;
+			}
+		}
+
+		Render{
+			Shadows
+			defered pass{
+				choose you shaders
+				GBuffer{
+					send c constants | cam
+					forech model: visibleModels
+						send model to pipeline
+						send textures
+				} -> albedo, normal, pos, smr (depth buff)
+				comp pass{
+					send c constants | lights
+				}
+			}
+			Particles(pass?)
+
+			PostProcess(bloom, cc, ao, ssr)
+		}
+	}
+
+private:
+};
+
+scena:
+	camera:
+
+	vector<volume> volumes
+	vector<model> allmodels
+	vector<particles> particels
+
+	vector<spotl> spotlights
+	vector<pointl> pointlights
+	directlight
+
+
+/*
+1:
+Render gltf;
+
+2:
+light, materials
+
+3:
+deferred render gltf, console
+
+4:
+multiple objects renderer / culling
+
+5: Sponza, pbr, dynamic lighting, postprocess
+scene: objects, level materials, lightmap, light sources, volume, decals
+
+6:
+physics, level physics, player, particles, camera collision test
+
+7:
+animation, resource manager
+
+8:
+ui, ui control, gui(im, div)
+
+9:
+scripting, profiler
+
+10:
+game modes
+
+11:
+grass, shaders, post process, env probs
+
+*/
+
+
+
+/*
+TODO: Render Stage
+=================
+
+
+v0:
+	Scene:
+		Object Array
+		Light Objects
+
+	Render:
+		GBuffer render
+		Lights(forward)
+
+=================
+
+
+v1:
+	Scene:
+		SceneGraph / Object Array
+		Light Objects
+
+	Render:
+		Pipeline
+		Multiple camera(texture render)
+		GBuffer render
+		Materials
+		Lights(deffered, dynamic lights)
+
+=================
+
+
+v2:
+	Scene:
+		Lightmap?
+		SceneGraph / Object Array
+		Light Objects
+		PostProcess Volume?
+		EnvProbs?
+
+	Render:
+		Pipeline
+		Multiple camera(texture render)
+		GBuffer render
+		Materials(viewer)
+		Lights(deffered, dynamic lights, pbr)
+		Particles
+		PostProcess(bloom, cc(tone mapping), ao, ssr)
+
+=================
+
+
+v3|Final:
+	Scene:
+		Lightmap
+		SceneGraph / Object Array
+		Light Objects
+		PostProcess Volume
+		EnvProbs?
+
+
+	PreRender:
+		Culling
+			Frutrum
+			Occlusion
+			Instancing
+			Batching?
+		EnvProbs?
+
+
+	Render:
+		Pipeline
+		Multiple camera(texture render) ? fullscreen rect tool
+		Shadows(shadow map)
+		GBuffer render
+		Materials(viewer, editor)
+		Lights(deffered, dynamic lights, pbr, env prob | spherical harmonics, gi)
+		Particles
+		PostProcess(bloom, cc, god rays, ao, ssr | mblur, chrooma, sss, volume lights?)
+*/
+

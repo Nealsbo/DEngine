@@ -8,8 +8,8 @@ int   frameCount     = 0;
 
 Uint64 currFrameCounter = 0;
 Uint64 lastFrameCounter = 0;
-float deltaTime         = 0.0f;
-float totalTime         = 0.0f;
+float deltaTime         = 0.001f;
+float totalTime         = 0.001f;
 
 
 void DEngine::PreInit(int argc, char** argv) {
@@ -26,6 +26,7 @@ void DEngine::Init() {
 	console       = new DConsole();
 	renderer      = new DRenderEngine();
 	session       = new DSession();
+	scene         = new DScene();
 
     result = windowManager->Init();
 	if(result) {
@@ -57,12 +58,27 @@ void DEngine::Init() {
 		Shutdown();
 	}
 
+	result = scene->Init();
+	if(result) {
+		Log::Msg("Scene init failed", LOG_LEVEL::ERROR);
+		Shutdown();
+	}
+
 	lastFrameCounter = SDL_GetPerformanceCounter();
 	currFrameCounter = lastFrameCounter;
+
+	// TODO: move to scene
+	std::string mdl = "../assets/glTF/Suzanne.gltf";
+	renderer->LoadModel(mdl);
 }
 
 void DEngine::Shutdown() {
     Log::Msg("Engine Shutdown", LOG_LEVEL::INFO);
+
+	if(scene) {
+		scene->Shutdown();
+		delete scene;
+	}
 
 	if(session) {
 		session->Shutdown();
@@ -105,25 +121,28 @@ void DEngine::Frame() {
 	//eventProcess();
 
 	// TODO: Implementation
-
+	
 	// Handle input
 	input->Update();
 	
 	// Game process update
 	// TODO Move update to dedicated instance
 	//session->Frame();
-	SceneUpdate(deltaTime);
+	scene->Update(deltaTime);
 
     // Render update
-	renderer->Draw(mainCamera);
+	renderer->DrawFrame(scene);
 }
-
+/*
 void DEngine::SceneUpdate(float delta) {
 	glm::vec2 mousexy = windowManager->GetMousePos();
+	//glm::vec3 adds = glm::vec3(0.0, 0.0, 0.005);
 	//glfwGetCursorPos(windowManager->GetWindow(), &xpos, &ypos);
 	mainCamera.ProcessMouse(mousexy.x, mousexy.y, true);
+	//mainCamera.AddPosition(adds);
 }
+*/
 
-void DEngine::LoadModels() {
-
+bool DEngine::IsRunning() {
+	return !isOnExitRequest;
 }

@@ -53,7 +53,7 @@ int DWindowManager::InitGL() {
 		return -1;
     }
 
-	window = SDL_CreateWindow("SDL App", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
+	window = SDL_CreateWindow("DEngine Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
     if (window == NULL) {
         printf("ERROR: Failed to create SDL window\n");
         SDL_Quit();

@@ -1,6 +1,7 @@
 #include "Shader.h"
 
 DShader::DShader(const char* vertexPath, const char* fragmentPath) {
+    printf("SHADER: Loading\n");
     std::string vertexCode;
     std::string fragmentCode;
 
@@ -97,7 +98,7 @@ void DShader::CheckCompileErrors(GLuint shader, std::string type) {
 
         if (!result) {
             glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-            printf("ERROR: Shdaer compilation error of type: %s\n", infoLog);
+            printf("ERROR: Shader compilation error of type: %s\n", infoLog);
         }
     } else {
         glGetProgramiv(shader, GL_LINK_STATUS, &result);

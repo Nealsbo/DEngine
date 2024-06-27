@@ -43,6 +43,7 @@ set(src_core
     src/core/Session.cpp
     src/core/WindowManager.cpp
     src/core/Camera.cpp
+    src/core/Scene.cpp
 
     src/renderer/RenderEngine.cpp
     src/renderer/Texture.cpp
