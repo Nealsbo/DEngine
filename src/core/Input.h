@@ -5,10 +5,21 @@
 
 #include <string>
 
+enum {
+    KEY_W = 1,
+    KEY_A,
+    KEY_S,
+    KEY_D,
+    KEY_SPACE,
+    KEY_TAB,
+    KEY_ESC,
+    KEY_CTRL,
+    KEY_LASTKEY
+};
 
 class DKey {
 public:
-    DKey();
+    DKey() { pressed = false; bind = ""; }
 
     bool pressed = false;
     std::string bind = "";
@@ -26,19 +37,20 @@ public:
     void SetKeyBinding(int key, std::string bind);
     std::string GetKeyBinding(int key);
 
-    float GetMouseXOffset();
-    float GetMouseYOffset();
+    int GetMouseXOffset();
+    int GetMouseYOffset();
 
     bool IsKeyDown(int key);
 
 private:
     void UpdateMousePosition();
 
+    void DebugPrintInput();
+
     SDL_Window * window = nullptr;
 
-    double mousex;
-    double mousey;
-    double mousexOffset;
-    double mouseyOffset;
+    int mousexOffset;
+    int mouseyOffset;
 };
 
+int keymap(int key);

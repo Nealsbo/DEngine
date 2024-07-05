@@ -26,6 +26,7 @@ endif()
 find_package(OpenGL REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
 find_package(SDL2 REQUIRED)
+find_package(Freetype REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
 # Build glad
@@ -56,12 +57,14 @@ set(src_core
 include_directories("src/core")
 include_directories("src/renderer")
 include_directories("${GLAD_DIR}/include")
+include_directories(${FREETYPE_INCLUDE_DIRS})
 
 add_executable(${CMAKE_PROJECT_NAME} ${src_core})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
     dl
+    Freetype::Freetype
     SDL2::SDL2
     "glad"
     OpenGL::GL

@@ -5,8 +5,12 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Shader.h"
-
-
+/*
+#define TINYGLTF_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../../ext/tiny_gltf.h"
+*/
 class DModel {
 public:
     DModel();
@@ -29,4 +33,9 @@ private:
     DShader * shader;
     DMesh * mesh;
     DTexture * texture;
+
+    //Model model;
+    //TinyGLTF loader;
+    std::string err;
+    std::string warn;
 };
