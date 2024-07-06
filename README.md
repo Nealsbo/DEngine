@@ -1,16 +1,18 @@
 # DEngine
-DEngine - game engine created for educational purposes
+DEngine - Simple game engine created for educational purposes
 
 # Features
-TO DO
+- Builds and Runs
 
 # Building
 ## Dependecies
 List of used 3rd party libs.
 
 Deps:
-- GLFW
+- SDL2
 - GLAD
+- tinygltf
+- stb_image
 - TO DO
 
 ## Build process
