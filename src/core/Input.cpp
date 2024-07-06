@@ -79,7 +79,7 @@ void DInputHandler::Update() {
         }
     }
 
-    DebugPrintInput();
+    //DebugPrintInput();
 
     if(keys[KEY_ESC].pressed == true)
         isOnExitRequest = true;

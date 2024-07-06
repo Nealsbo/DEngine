@@ -47,6 +47,10 @@ DRenderEngine::~DRenderEngine() {
 int DRenderEngine::Init(DWindowManager * wm) {
     win = wm;
 
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
     
     if(!LoadFont()) printf("ERROR: Font load failed!\n");
@@ -64,19 +68,11 @@ void DRenderEngine::DrawFrame(DScene *scene) {
     glClearColor(0.3f, 0.0f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    shader->Use();
-    DCamera *cam = scene->GetCamera();
-
-    projectionm = glm::perspective(glm::radians(cam->GetFov()), 1280.0f / 720.0f, 0.1f, 100.0f);
-    viewm = cam->GetViewMatrix();
-    modelm = glm::rotate(modelm, glm::radians(0.2f), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 mvp = projectionm * viewm * modelm;
-
-    shader->SetMat4("MVP", mvp);
-    shader->SetVec3("sun_position", glm::vec3(3.0, 10.0, -5.0));
-    shader->SetVec3("sun_color", glm::vec3(1.0));
+    camera = scene->GetCamera();
 
     Draw();
+
+    RenderText(std::string("Test debug text"), 25.0f, 720.0f-57.0f, 1.0f);
 
     win->SwapBuffers();
 }
@@ -102,6 +98,19 @@ void DRenderEngine::DrawModelNodes(tinygltf::Node& node) {
 }
 
 void DRenderEngine::Draw() {
+    projectionm = glm::perspective(glm::radians(camera->GetFov()), 1280.0f / 720.0f, 0.1f, 100.0f);
+    viewm = camera->GetViewMatrix();
+    modelm = glm::rotate(modelm, glm::radians(0.2f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 mvp = projectionm * viewm * modelm;
+
+    shader->Use();
+    shader->SetMat4("MVP", mvp);
+    shader->SetVec3("sun_position", glm::vec3(3.0, 10.0, -5.0));
+    shader->SetVec3("sun_color", glm::vec3(1.0));
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, TextureID);
+
     glBindVertexArray(VAO_and_EBOs.first);
 
     const tinygltf::Scene& scene = model.scenes[model.defaultScene];
@@ -269,6 +278,7 @@ void DRenderEngine::SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &mode
                 }
 
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, format, type, &image.image.at(0));
+                TextureID = texid;
             }
         }
     }
@@ -305,7 +315,7 @@ bool DRenderEngine::LoadFont() {
     bool success = true;
 
     textshader = new DShader("../assets/shaders/text.vs", "../assets/shaders/text.fs");
-    glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(1280), 0.0f, static_cast<float>(720));
+    glm::mat4 projection = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f);
     textshader->Use();
     glUniformMatrix4fv(glGetUniformLocation(textshader->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -368,6 +378,16 @@ bool DRenderEngine::LoadFont() {
     FT_Done_Face(face);
     FT_Done_FreeType(ft);
 
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
 	return success;
 }
 
@@ -375,9 +395,9 @@ void DRenderEngine::PrintDebugMsg(const std::string& message) {
 
 }
 
-void DRenderEngine::RenderText(DShader &_shader, std::string text, float x, float y, float scale) {
-    _shader.Use();
-    glUniform3f(glGetUniformLocation(_shader.ID, "textColor"), 1.0f, 1.0f, 1.0f);
+void DRenderEngine::RenderText(std::string text, float x, float y, float scale) {
+    textshader->Use();
+    glUniform3f(glGetUniformLocation(textshader->ID, "textColor"), 1.0f, 1.0f, 0.5f);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 

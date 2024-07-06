@@ -11,7 +11,7 @@ public:
 	DRenderEngine();
 	~DRenderEngine();
 
-	int Init(DWindowManager * wm);
+	int  Init(DWindowManager * wm);
 	void Shutdown();
 
 	void DrawFrame(DScene *scene);
@@ -34,7 +34,7 @@ public:
 	void PrintModel(const tinygltf::Model &model);
 
 	bool LoadFont();
-	void RenderText(DShader &shader, std::string text, float x, float y, float scale);
+	void RenderText(std::string text, float x, float y, float scale);
 	void PrintDebugMsg(const std::string& message);
 
 private:
@@ -45,9 +45,11 @@ private:
 
   	GLuint VAO, VBO;
 	std::pair<unsigned int, std::map<int, unsigned int>> VAO_and_EBOs;
+	unsigned int TextureID;
 	
 	DShader *shader;
 	DShader *textshader;
+	DCamera *camera;
 
 	char buffer[99999];
 	char text[16] = "helloworld";
