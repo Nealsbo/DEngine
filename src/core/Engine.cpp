@@ -69,7 +69,7 @@ void DEngine::Init() {
 
 	// TODO: move to scene
 	std::string mdl = "../assets/glTF/Suzanne.gltf";
-	renderer->LoadModel(mdl);
+	scene->AddModel(mdl);
 }
 
 void DEngine::Shutdown() {
@@ -131,7 +131,7 @@ void DEngine::Frame() {
 	scene->Update(deltaTime);
 
     // Render update
-	renderer->DrawFrame(scene);
+	renderer->DrawFrame(scene, deltaTime);
 }
 /*
 void DEngine::SceneUpdate(float delta) {

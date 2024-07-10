@@ -20,12 +20,15 @@ public:
     void SetCamera(DCamera &camera);
     DCamera * GetCamera();
     
-    void AddModel(DModel &model);
+    void AddModel(DModel *model);
+    void AddModel(const std::string& model_name);
 
     void Update(float delta);
 
+    void PrintSceneInfo();
+
     DCamera *main_camera;
-    std::vector<DModel> scene_models;
+    std::vector<DModel *> scene_models;
     //std::vector<DParticles> scene_particels
     //std::vector<DVolume> scene_volumes;
 

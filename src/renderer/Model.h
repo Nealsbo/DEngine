@@ -1,29 +1,36 @@
-#pragma once
+#ifndef __MODEL_H__
+#define __MODEL_H__
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Texture.h"
 #include "Mesh.h"
 #include "Shader.h"
-/*
-#define TINYGLTF_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
+
 #include "../../ext/tiny_gltf.h"
-*/
+
 class DModel {
 public:
     DModel();
     ~DModel();
 
-    void Draw();
-
-    void SetShader();
+    void Draw(const glm::mat4& camMat);
+    void DrawMesh(const std::map<int, GLuint>& ebos, tinygltf::Mesh& mesh);
+    void DrawModelNodes(tinygltf::Node& node);
+    void SetShader(DShader * _shader);
     void SetTexture();
 
     void SetPosition(glm::vec3 &position);
     void SetRotation(glm::vec3 &rotation);
     void SetScale(glm::vec3 &scale);
+
+    void LoadModel(const std::string &fileName);
+    std::pair<GLuint, std::map<int, GLuint>> SetupModel();
+    void SetupModelNodes(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Node &node);
+    void SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Mesh &mesh);
+
+    void PrintModel();
 
 private:
     glm::vec3 position;
@@ -34,8 +41,13 @@ private:
     DMesh * mesh;
     DTexture * texture;
 
-    //Model model;
-    //TinyGLTF loader;
+    std::pair<unsigned int, std::map<int, unsigned int>> VAO_and_EBOs;
+	unsigned int TextureID;
+
+    tinygltf::Model model;
+    tinygltf::TinyGLTF loader;
     std::string err;
     std::string warn;
 };
+
+#endif

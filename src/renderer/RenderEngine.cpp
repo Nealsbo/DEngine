@@ -8,23 +8,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#define TINYGLTF_IMPLEMENTATION
-#define STB_IMAGE_IMPLEMENTATION
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-
-// #define TINYGLTF_NOEXCEPTION // optional. disable exception handling.
-#include "../../ext/tiny_gltf.h"
-
-//#include "../../ext/stb_image.h"
-//#include "../../ext/stb_image_write.h"
-//#include "../../ext/json.hpp"
-
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-using namespace tinygltf;
-
-Model model;
-TinyGLTF loader;
 std::string err;
 std::string warn;
 
@@ -37,11 +22,7 @@ std::map<GLchar, Character> Characters;
 DRenderEngine::DRenderEngine() {}
 
 DRenderEngine::~DRenderEngine() {
-    glDeleteVertexArrays(1, &VAO_and_EBOs.first);
-    for (auto it = VAO_and_EBOs.second.cbegin(); it != VAO_and_EBOs.second.cend();) {
-        glDeleteBuffers(1, &VAO_and_EBOs.second[it->first]);
-        VAO_and_EBOs.second.erase(it++);
-    }
+    delete textShader;
 }
 
 int DRenderEngine::Init(DWindowManager * wm) {
@@ -50,274 +31,60 @@ int DRenderEngine::Init(DWindowManager * wm) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
     
     if(!LoadFont()) printf("ERROR: Font load failed!\n");
-
-    modelm = glm::mat4(1.0f);
 
     return 0;
 }
 
-void DRenderEngine::Shutdown() {
-    delete shader;
-}
+void DRenderEngine::Shutdown() {}
 
-void DRenderEngine::DrawFrame(DScene *scene) {
-    glClearColor(0.3f, 0.0f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void DRenderEngine::DrawFrame(DScene *scene, float delta) {
+    BeginFrame();
+    
+    for(const auto& model: scene->scene_models) {
+        model->Draw(scene->GetCamera()->GetViewMatrix());
+    }
 
-    camera = scene->GetCamera();
+    currentFrameDelta = (currentFrameDelta + 1) % deltaBufferSize;
+    avgFrameDelta[currentFrameDelta] = delta;
 
-    Draw();
-
-    RenderText(std::string("Test debug text"), 25.0f, 720.0f-57.0f, 1.0f);
+    DrawAvgFps();
 
     win->SwapBuffers();
+
+    EndFrame();
 }
 
-void DRenderEngine::DrawMesh(const std::map<int, GLuint>& ebos, tinygltf::Mesh& mesh) {
-    for (size_t i = 0; i < mesh.primitives.size(); ++i) {
-        tinygltf::Primitive primitive = mesh.primitives[i];
-        tinygltf::Accessor indexAccessor = model.accessors[primitive.indices];
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebos.at(indexAccessor.bufferView));
-        glDrawElements(primitive.mode, indexAccessor.count, indexAccessor.componentType, BUFFER_OFFSET(indexAccessor.byteOffset));
-    }
+void DRenderEngine::BeginFrame() {
+    //start timer
+    glClearColor(0.3f, 0.0f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void DRenderEngine::DrawModelNodes(tinygltf::Node& node) {
-    if ((node.mesh >= 0) && (node.mesh < (int)model.meshes.size())) {
-        DrawMesh(VAO_and_EBOs.second, model.meshes[node.mesh]);
-    }
-
-    for (size_t i = 0; i < node.children.size(); i++) {
-        DrawModelNodes(model.nodes[node.children[i]]);
-    }
+void DRenderEngine::EndFrame() {
+    //stop timer
 }
 
-void DRenderEngine::Draw() {
-    projectionm = glm::perspective(glm::radians(camera->GetFov()), 1280.0f / 720.0f, 0.1f, 100.0f);
-    viewm = camera->GetViewMatrix();
-    modelm = glm::rotate(modelm, glm::radians(0.2f), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 mvp = projectionm * viewm * modelm;
+void DRenderEngine::DrawAvgFps() {
+    float avgFps = 0.0f;
 
-    shader->Use();
-    shader->SetMat4("MVP", mvp);
-    shader->SetVec3("sun_position", glm::vec3(3.0, 10.0, -5.0));
-    shader->SetVec3("sun_color", glm::vec3(1.0));
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, TextureID);
-
-    glBindVertexArray(VAO_and_EBOs.first);
-
-    const tinygltf::Scene& scene = model.scenes[model.defaultScene];
-    for (size_t i = 0; i < scene.nodes.size(); ++i) {
-        DrawModelNodes(model.nodes[scene.nodes[i]]);
+    for(int i = 0; i < deltaBufferSize; i++) {
+        avgFps += avgFrameDelta[i];
     }
+    avgFps = avgFps / deltaBufferSize;
 
-    glBindVertexArray(0);
+    std::string fps_text = "FPS: " + std::to_string(1000.0f / avgFps);
+    RenderText(fps_text, 16.0f, 720.0f-16.0f-16.f, 1.0f);
 }
-
-void DRenderEngine::SetModel() {}
-void DRenderEngine::SetMesh() {}
-void DRenderEngine::SetTexture() {}
-void DRenderEngine::SetShader() {}
-
-void DRenderEngine::LoadModel(std::string &fileName) {
-    //bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, "../assets/glTF/Suzanne.gltf");
-    bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, fileName.c_str());
-    if (!warn.empty()) {
-        printf("Warn: %s\n", warn.c_str());
-    }
-
-    if (!err.empty()) {
-        printf("Err: %s\n", err.c_str());
-    }
-
-    if (!ret) {
-        printf("Failed to parse glTF\n");
-    }
-
-    PrintModel(model);
-    VAO_and_EBOs = SetupModel(model);
-}
-
-std::pair<GLuint, std::map<int, GLuint>> DRenderEngine::SetupModel(tinygltf::Model &model) {
-    std::map<int, GLuint> ebos;
-    GLuint vao;
-
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    //create an ebo for each node in the scene
-    const tinygltf::Scene& scene = model.scenes[model.defaultScene];
-    for (size_t i = 0; i < scene.nodes.size(); ++i) {
-        assert((scene.nodes[i] >= 0) && (scene.nodes[i] < (int)model.nodes.size()));
-        SetupModelNodes(ebos, model, model.nodes[scene.nodes[i]]);
-    }
-
-    glBindVertexArray(0);
-    //cleanup: make sure only ebos are stored
-    for (auto it = ebos.cbegin(); it != ebos.cend();) {
-        tinygltf::BufferView bufferView = model.bufferViews[it->first];
-        if (bufferView.target != GL_ELEMENT_ARRAY_BUFFER) {
-            glDeleteBuffers(1, &ebos[it->first]);
-          ebos.erase(it++);
-        }
-        else {
-            ++it;
-        }
-    }
-
-    return { vao, ebos };
-}
-
-void DRenderEngine::SetupModelNodes(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Node &node) {
-    if ((node.mesh >= 0) && (node.mesh < (int)model.meshes.size())) {
-        SetupMesh(ebos, model, model.meshes[node.mesh]);
-    }
-
-    for (size_t i = 0; i < node.children.size(); i++) {
-        assert((node.children[i] >= 0) && (node.children[i] < (int)model.nodes.size()));
-        SetupModelNodes(ebos, model, model.nodes[node.children[i]]);
-    }
-}
-
-void DRenderEngine::SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Mesh &mesh) {
-    for (size_t i = 0; i < model.bufferViews.size(); ++i) {
-        const tinygltf::BufferView& bufferView = model.bufferViews[i];
-        if (bufferView.target == 0) {
-            printf("WARN: bufferView.target is zero\n");
-            continue;  // Unsupported bufferView.
-                       /*
-                         From spec2.0 readme:
-                         https://github.com/KhronosGroup/glTF/tree/master/specification/2.0
-                                  ... drawArrays function should be used with a count equal to
-                         the count            property of any of the accessors referenced by the
-                         attributes            property            (they are all equal for a given
-                         primitive).
-                       */
-        }
-
-        const tinygltf::Buffer& buffer = model.buffers[bufferView.buffer];
-
-        GLuint ebo;
-        glGenBuffers(1, &ebo);
-        ebos[i] = ebo;
-
-        glBindBuffer(bufferView.target, ebo);
-        glBufferData(bufferView.target, bufferView.byteLength, &buffer.data.at(0) + bufferView.byteOffset, GL_STATIC_DRAW);
-    }
-
-    for (size_t i = 0; i < mesh.primitives.size(); ++i) {
-        tinygltf::Primitive primitive = mesh.primitives[i];
-        tinygltf::Accessor indexAccessor = model.accessors[primitive.indices];
-
-        for (auto& attrib : primitive.attributes) {
-            tinygltf::Accessor accessor = model.accessors[attrib.second];
-            int byteStride = accessor.ByteStride(model.bufferViews[accessor.bufferView]);
-            glBindBuffer(GL_ARRAY_BUFFER, ebos[accessor.bufferView]);
-
-            int size = 1;
-            if (accessor.type != TINYGLTF_TYPE_SCALAR) {
-                size = accessor.type;
-            }
-
-            int vaa = -1;
-            if (attrib.first.compare("POSITION") == 0) vaa = 0;
-            if (attrib.first.compare("NORMAL") == 0) vaa = 1;
-            if (attrib.first.compare("TEXCOORD_0") == 0) vaa = 2;
-            if (vaa > -1) {
-                glEnableVertexAttribArray(vaa);
-                glVertexAttribPointer(vaa, size, accessor.componentType, accessor.normalized ? GL_TRUE : GL_FALSE, byteStride, ((char*)NULL + accessor.byteOffset));
-            }
-            else
-                printf("vaa missing: %s\n", attrib.first.c_str());
-        }
-
-        if (model.textures.size() > 0) {
-        // fixme: Use material's baseColor
-            tinygltf::Texture &tex = model.textures[0];
-
-            if (tex.source > -1) {
-
-                GLuint texid;
-                glGenTextures(1, &texid);
-
-                tinygltf::Image &image = model.images[tex.source];
-
-                glBindTexture(GL_TEXTURE_2D, texid);
-                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-                GLenum format = GL_RGBA;
-
-                if (image.component == 1) {
-                  format = GL_RED;
-                } else if (image.component == 2) {
-                  format = GL_RG;
-                } else if (image.component == 3) {
-                  format = GL_RGB;
-                } else {
-                  // ???
-                }
-
-                GLenum type = GL_UNSIGNED_BYTE;
-                if (image.bits == 8) {
-                  // ok
-                } else if (image.bits == 16) {
-                  type = GL_UNSIGNED_SHORT;
-                } else {
-                  // ???
-                }
-
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, format, type, &image.image.at(0));
-                TextureID = texid;
-            }
-        }
-    }
-}
-
-void DRenderEngine::PrintModel(const tinygltf::Model &model) {
-    for (auto &mesh : model.meshes) {
-        std::cout << "mesh : " << mesh.name << std::endl;
-        for (auto &primitive : mesh.primitives) {
-            const tinygltf::Accessor &indexAccessor = model.accessors[primitive.indices];
-            printf("indexaccessor: count %lu, type %i\n", indexAccessor.count, indexAccessor.componentType);
-
-            const tinygltf::Material &mat = model.materials[primitive.material];
-            for (auto &mats : mat.values) {
-                printf("mat : %s\n", mats.first.c_str());
-            }
-
-            for (auto &image : model.images) {
-                printf("image name : %s\n", image.uri.c_str());
-                printf("  size : %lu\n", image.image.size());
-                printf("  w/h  : %i/%i\n", image.width, image.height);
-            }
-
-            printf("indices   : %i\n", primitive.indices);
-            printf("mode      : (%i)\n", primitive.mode);
-            for (auto &attrib : primitive.attributes) {
-                printf("attribute : %s\n", attrib.first.c_str());
-            }
-        }
-    }
-}
-
+   
 bool DRenderEngine::LoadFont() {
     bool success = true;
 
-    textshader = new DShader("../assets/shaders/text.vs", "../assets/shaders/text.fs");
+    textShader = new DShader("../assets/shaders/text.vs", "../assets/shaders/text.fs");
     glm::mat4 projection = glm::ortho(0.0f, 1280.0f, 0.0f, 720.0f);
-    textshader->Use();
-    glUniformMatrix4fv(glGetUniformLocation(textshader->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+    textShader->Use();
+    glUniformMatrix4fv(glGetUniformLocation(textShader->ID, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
     FT_Library ft;
     // All functions return a value different than 0 whenever an error occurred
@@ -341,7 +108,7 @@ bool DRenderEngine::LoadFont() {
     }
     else {
         // set size to load glyphs as
-        FT_Set_Pixel_Sizes(face, 0, 48);
+        FT_Set_Pixel_Sizes(face, 0, 24);
 
         // disable byte-alignment restriction
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -396,8 +163,8 @@ void DRenderEngine::PrintDebugMsg(const std::string& message) {
 }
 
 void DRenderEngine::RenderText(std::string text, float x, float y, float scale) {
-    textshader->Use();
-    glUniform3f(glGetUniformLocation(textshader->ID, "textColor"), 1.0f, 1.0f, 0.5f);
+    textShader->Use();
+    glUniform3f(glGetUniformLocation(textShader->ID, "textColor"), 0.5f, 1.0f, 0.5f);
     glActiveTexture(GL_TEXTURE0);
     glBindVertexArray(VAO);
 

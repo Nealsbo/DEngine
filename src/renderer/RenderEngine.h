@@ -5,7 +5,9 @@
 
 #include "Shader.h"
 
-#include "../../ext/tiny_gltf.h"
+// counts average fps for given amount of frames
+const int deltaBufferSize = 10;
+
 class DRenderEngine {
 public:
 	DRenderEngine();
@@ -14,24 +16,11 @@ public:
 	int  Init(DWindowManager * wm);
 	void Shutdown();
 
-	void DrawFrame(DScene *scene);
+	void DrawFrame(DScene *scene, float delta);
+	void DrawAvgFps();
 
-	void Draw();
-	void DrawModelNodes(tinygltf::Node& node);
-	void DrawMesh(const std::map<int, GLuint>& ebos, tinygltf::Mesh& mesh);
-
-	void SetModel();
-
-	void SetMesh();
-	void SetTexture();
-	void SetShader();
-
-	void LoadModel(std::string &fileName);
-	std::pair<unsigned int, std::map<int, unsigned int>> SetupModel(tinygltf::Model &model);
-	void SetupModelNodes(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Node &node);
-	void SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Mesh &mesh);
-
-	void PrintModel(const tinygltf::Model &model);
+	void BeginFrame();
+	void EndFrame();
 
 	bool LoadFont();
 	void RenderText(std::string text, float x, float y, float scale);
@@ -40,19 +29,16 @@ public:
 private:
 	DWindowManager * win;
 
-	float scale;
-	//std::map<int, GLuint> ebos;
-
   	GLuint VAO, VBO;
-	std::pair<unsigned int, std::map<int, unsigned int>> VAO_and_EBOs;
-	unsigned int TextureID;
 	
-	DShader *shader;
-	DShader *textshader;
+	DShader *textShader;
 	DCamera *camera;
 
 	char buffer[99999];
 	char text[16] = "helloworld";
+
+	float avgFrameDelta[deltaBufferSize] = { 0 };
+	int currentFrameDelta = 0;
 };
 
 struct Character {

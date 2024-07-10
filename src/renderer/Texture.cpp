@@ -15,6 +15,8 @@ DTexture::DTexture() {
     glGenTextures(1, &this->ID);
 }
 
+DTexture::~DTexture() {}
+
 void DTexture::Generate(unsigned int width, unsigned int height, unsigned char* data) {
     this->Width  = width;
     this->Height = height;
