@@ -30,23 +30,31 @@ void DModel::SetTexture() {
 
 }
 
-void DModel::SetPosition(glm::vec3 &position) {
-    this->position = position;
+void DModel::AddPosition(glm::vec3 &pos) {
+    position += pos;
 }
 
-void DModel::SetRotation(glm::vec3 &rotation) {
-    this->rotation = rotation;
+void DModel::AddRotation(glm::vec3 &rot) {
+    rotation += rot;
 }
 
-void DModel::SetScale(glm::vec3 &scale) {
-    this->scale = scale;
+void DModel::SetPosition(glm::vec3 &pos) {
+    position = pos;
+}
+
+void DModel::SetRotation(glm::vec3 &rot) {
+    rotation = rot;
+}
+
+void DModel::SetScale(glm::vec3 &s) {
+    scale = s;
 }
 
 void DModel::Draw(const glm::mat4& camMat) {
     glm::mat4 projectionm = glm::perspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
     glm::mat4 viewm = camMat;
     glm::mat4 modelm = glm::mat4(1.0f);
-    modelm = glm::rotate(modelm, glm::radians(0.2f), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 mvp = projectionm * viewm * modelm;
 
     shader->Use();

@@ -45,9 +45,10 @@ void DScene::AddModel(const std::string& model_name) {
 }
 
 void DScene::Update(float delta) {
-
+    glm::vec3 rot = glm::vec3(0.0f, 0.05f * delta, 0.0f);
+    scene_models[0]->AddRotation(rot);
 }
 
 void DScene::PrintSceneInfo() {
-    printf("Scene model count: %i\n", scene_models.size());
+    printf("Scene model count: %li\n", scene_models.size());
 }

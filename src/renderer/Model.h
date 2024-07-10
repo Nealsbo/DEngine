@@ -21,9 +21,12 @@ public:
     void SetShader(DShader * _shader);
     void SetTexture();
 
-    void SetPosition(glm::vec3 &position);
-    void SetRotation(glm::vec3 &rotation);
-    void SetScale(glm::vec3 &scale);
+    void AddPosition(glm::vec3 &pos);
+    void AddRotation(glm::vec3 &rot);
+
+    void SetPosition(glm::vec3 &pos);
+    void SetRotation(glm::vec3 &rot);
+    void SetScale(glm::vec3 &s);
 
     void LoadModel(const std::string &fileName);
     std::pair<GLuint, std::map<int, GLuint>> SetupModel();
