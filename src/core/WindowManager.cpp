@@ -15,6 +15,10 @@ int DWindowManager::Init() {
 	lastX = screenWidth / 2.0f;
 	lastY = screenHeight / 2.0f;
 	InitGL();
+
+    if(GrabMouse(true)) {
+        printf("ERROR: SDL. Failed to set mouse mode\n");
+    }
 	return 0;
 }
 
@@ -36,6 +40,10 @@ glm::vec2 DWindowManager::GetMousePos() {
 
 float DWindowManager::GetMouseScroll() {
 	return scrollOffset;
+}
+
+int DWindowManager::GrabMouse(bool val) {
+    return SDL_SetRelativeMouseMode(val ? SDL_TRUE : SDL_FALSE);
 }
 
 int DWindowManager::InitGL() {
@@ -65,7 +73,7 @@ int DWindowManager::InitGL() {
     SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-	SDL_GL_SetSwapInterval(1);
+	SDL_GL_SetSwapInterval(0);
 
 	glContext = SDL_GL_CreateContext( window );
     if( glContext == NULL ) {

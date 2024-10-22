@@ -6,6 +6,7 @@
 
 #include "Camera.h"
 #include "../renderer/Model.h"
+#include "../renderer/Light.h"
 
 class DScene {
 public:
@@ -16,9 +17,10 @@ public:
     void Shutdown();
 
     void LoadScene(const std::string& scene_name);
+    void LoadDefaultScene();
 
-    void SetCamera(DCamera &camera);
-    DCamera * GetCamera();
+    void SetMainCamera(DCamera *camera);
+    DCamera * GetMainCamera();
     
     void AddModel(DModel *model);
     void AddModel(const std::string& model_name);
@@ -29,12 +31,16 @@ public:
 
     DCamera *main_camera;
     std::vector<DModel *> scene_models;
+	std::vector<DLight *> point_lights;
+    std::string scene_name;
+    std::string scene_filename;
     //std::vector<DParticles> scene_particels
     //std::vector<DVolume> scene_volumes;
 
 	//DDirectLight *direct_light;
-	//std::vector<DSpotLight> spot_lights
-	//std::vector<DPointLight> point_lights
+	//std::vector<DSpotLight> spot_lights;
+
+    float sceneTime;
 };
 
 #endif //_SCENE_

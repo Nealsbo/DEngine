@@ -21,9 +21,7 @@ std::map<GLchar, Character> Characters;
 
 DRenderEngine::DRenderEngine() {}
 
-DRenderEngine::~DRenderEngine() {
-    delete textShader;
-}
+DRenderEngine::~DRenderEngine() {}
 
 int DRenderEngine::Init(DWindowManager * wm) {
     win = wm;
@@ -31,19 +29,25 @@ int DRenderEngine::Init(DWindowManager * wm) {
     glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    if(!LoadFont()) printf("ERROR: Font load failed!\n");
+
+    if(!LoadFont()) {
+        printf("ERROR: Font load failed!\n");
+    }
 
     return 0;
 }
 
-void DRenderEngine::Shutdown() {}
+void DRenderEngine::Shutdown() {
+    delete textShader;
+}
 
 void DRenderEngine::DrawFrame(DScene *scene, float delta) {
     BeginFrame();
-    
+
+    DCamera *mainCamera = scene->GetMainCamera();
+
     for(const auto& model: scene->scene_models) {
-        model->Draw(scene->GetCamera()->GetViewMatrix());
+        model->Draw(mainCamera->GetViewMatrix(), mainCamera->GetPosition(), scene->point_lights[0]);
     }
 
     currentFrameDelta = (currentFrameDelta + 1) % deltaBufferSize;
@@ -75,7 +79,7 @@ void DRenderEngine::DrawAvgFps() {
     avgFps = avgFps / deltaBufferSize;
 
     std::string fps_text = "FPS: " + std::to_string(1000.0f / avgFps);
-    RenderText(fps_text, 16.0f, 720.0f-16.0f-16.f, 1.0f);
+    RenderText(fps_text, 16.0f, 720.0f - 16.0f - 16.0f, 1.0f);
 }
    
 bool DRenderEngine::LoadFont() {
@@ -99,7 +103,7 @@ bool DRenderEngine::LoadFont() {
         printf("ERROR::FREETYPE: Failed to load font_name\n");
         return -1;
     }
-	
+
 	// load font as face
     FT_Face face;
     if (FT_New_Face(ft, font_name.c_str(), 0, &face)) {

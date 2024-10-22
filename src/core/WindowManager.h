@@ -21,6 +21,8 @@ public:
 	glm::vec2 GetMousePos();
 	float GetMouseScroll();
 
+	int GrabMouse(bool val);
+
 	SDL_Window* GetWindow();
 
 private:

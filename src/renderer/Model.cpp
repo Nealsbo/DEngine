@@ -8,7 +8,9 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 DModel::DModel() {
-
+    position = glm::vec3(0.0f);
+    rotation = glm::vec3(0.0f);
+    scale = glm::vec3(1.0f);
 }
 
 DModel::~DModel() {
@@ -50,17 +52,40 @@ void DModel::SetScale(glm::vec3 &s) {
     scale = s;
 }
 
-void DModel::Draw(const glm::mat4& camMat) {
+glm::vec3 DModel::GetPosition() {
+    return position;
+}
+
+glm::vec3 DModel::GetRotation() {
+    return rotation;
+}
+
+glm::vec3 DModel::GetScale() {
+    return scale;
+}
+
+
+void DModel::Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *light) {
     glm::mat4 projectionm = glm::perspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
     glm::mat4 viewm = camMat;
     glm::mat4 modelm = glm::mat4(1.0f);
-    modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    //modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
     glm::mat4 mvp = projectionm * viewm * modelm;
 
     shader->Use();
-    shader->SetMat4("MVP", mvp);
-    shader->SetVec3("sun_position", glm::vec3(3.0, 10.0, -5.0));
-    shader->SetVec3("sun_color", glm::vec3(1.0));
+    //shader->SetMat4("MVP", mvp);
+    shader->SetMat4("Proj", projectionm);
+    shader->SetMat4("View", viewm);
+    shader->SetMat4("Model", modelm);
+    shader->SetVec3("viewPos", camPos);
+
+    // light properties
+    shader->SetVec3("lightPos", light->GetPosition());
+    shader->SetVec3("lightColor", light->GetColor());
+
+    // material properties
+    shader->SetVec3("material.specular", 0.8f, 0.8f, 0.8f);
+    shader->SetFloat("material.shininess", 64.0f);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, TextureID);

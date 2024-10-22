@@ -40,6 +40,7 @@ private:
 	DSession *       session       = nullptr;
 	DScene *         scene         = nullptr;
 
-	bool isRunning = true;
+	bool             isRunning     = true;
+	Uint32           frameCap      = 60;
 };
 

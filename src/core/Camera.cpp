@@ -5,7 +5,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 DCamera::DCamera() {
-    position = glm::vec3(0.0f, 0.0f, 3.0f);
+    position = glm::vec3(0.0f, 0.0f, 5.0f);
     front = glm::vec3(0.0f, 0.0f, -1.0f);
     up = glm::vec3(0.0f, 1.0f, 0.0f);
     world_up = up;

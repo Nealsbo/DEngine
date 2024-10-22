@@ -7,6 +7,7 @@
 #include "Texture.h"
 #include "Mesh.h"
 #include "Shader.h"
+#include "Light.h"
 
 #include "../../ext/tiny_gltf.h"
 
@@ -15,7 +16,7 @@ public:
     DModel();
     ~DModel();
 
-    void Draw(const glm::mat4& camMat);
+    void Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *light);
     void DrawMesh(const std::map<int, GLuint>& ebos, tinygltf::Mesh& mesh);
     void DrawModelNodes(tinygltf::Node& node);
     void SetShader(DShader * _shader);
@@ -27,6 +28,10 @@ public:
     void SetPosition(glm::vec3 &pos);
     void SetRotation(glm::vec3 &rot);
     void SetScale(glm::vec3 &s);
+
+    glm::vec3 GetPosition();
+    glm::vec3 GetRotation();
+    glm::vec3 GetScale();
 
     void LoadModel(const std::string &fileName);
     std::pair<GLuint, std::map<int, GLuint>> SetupModel();

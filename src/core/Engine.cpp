@@ -7,9 +7,12 @@ extern bool isOnExitRequest;
 int   frameCount     = 0;
 
 Uint64 currFrameCounter = 0;
+Uint64 currFrameCounter2= 0;
 Uint64 lastFrameCounter = 0;
 float deltaTime         = 0.001f;
+float deltaTime2        = 0.001f;
 float totalTime         = 0.001f;
+float cappedDeltaTime   = 0.001f;
 
 
 void DEngine::PreInit(int argc, char** argv) {
@@ -20,6 +23,7 @@ void DEngine::Init() {
     Log::Msg("Engine Init", LOG_LEVEL::INFO);
 
 	int result;
+	std::string new_scene;
 
     windowManager = new DWindowManager();
 	input         = new DInputHandler();
@@ -67,9 +71,11 @@ void DEngine::Init() {
 	lastFrameCounter = SDL_GetPerformanceCounter();
 	currFrameCounter = lastFrameCounter;
 
-	// TODO: move to scene
-	std::string mdl = "../assets/glTF/Suzanne.gltf";
-	scene->AddModel(mdl);
+	if(new_scene.empty()) {
+		scene->LoadDefaultScene();
+	} else {
+		scene->LoadScene(new_scene);
+	}
 }
 
 void DEngine::Shutdown() {
@@ -117,21 +123,34 @@ void DEngine::Frame() {
 	deltaTime = (float)((currFrameCounter - lastFrameCounter) * 1000 / (float)SDL_GetPerformanceFrequency());
 	totalTime += deltaTime;
 
-	// Handle commands and events
-	//eventProcess();
+	// Move scope to session
+	{
+		uint64_t time1 = SDL_GetPerformanceCounter();
+		// Handle commands and events
+		//eventProcess();
 
-	// TODO: Implementation
-	
-	// Handle input
-	input->Update();
-	
-	// Game process update
-	// TODO Move update to dedicated instance
-	//session->Frame();
-	scene->Update(deltaTime);
+		// Handle input
+		input->Update();
 
-    // Render update
-	renderer->DrawFrame(scene, deltaTime);
+		// Game process update
+		// TODO Move update to dedicated instance/session
+		//session->Frame();
+		scene->Update(deltaTime);
+
+    	// Render update
+		renderer->DrawFrame(scene, deltaTime);
+
+		uint64_t time2 = SDL_GetPerformanceCounter();
+		deltaTime2 = (float)((time2 - time1) * 1000 / (float)SDL_GetPerformanceFrequency());
+
+		// frame cap
+		float cappedFrameTime = 1000.0f / (float)frameCap;
+		if(deltaTime2 < cappedFrameTime) {
+			SDL_Delay((uint32_t)(cappedFrameTime - deltaTime2));
+		}
+	}
+
+	//printf("Frame time: %.3f | Logic time: %.3f\n", deltaTime, deltaTime2);
 }
 /*
 void DEngine::SceneUpdate(float delta) {
