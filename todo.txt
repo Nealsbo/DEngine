@@ -56,10 +56,10 @@ scena:
 
 /*
 1:
-Render gltf;
+Render gltf; //done 1/1
 
 2:
-light, materials
+light, materials //done 1/2
 
 3:
 deferred render gltf, console

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "Camera.h"
+#include "Input.h"
 #include "../renderer/Model.h"
 #include "../renderer/Light.h"
 
@@ -13,7 +14,7 @@ public:
     DScene();
     ~DScene();
 
-    int Init();
+    int Init(DInputHandler *in);
     void Shutdown();
 
     void LoadScene(const std::string& scene_name);
@@ -29,6 +30,7 @@ public:
 
     void PrintSceneInfo();
 
+    DInputHandler *input;
     DCamera *main_camera;
     std::vector<DModel *> scene_models;
 	std::vector<DLight *> point_lights;

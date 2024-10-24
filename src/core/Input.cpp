@@ -114,8 +114,8 @@ void DInputHandler::UpdateMousePosition() {
 
 void DInputHandler::DebugPrintInput() {
     for(unsigned int i = 1; i < keys.size(); i++) {
-        //if(keys[i].pressed)
-        //printf("key: %s| state: %i\n", keynames[i].name.c_str(), keys[i].pressed);
+        if(keys[i].pressed)
+        printf("key: %s| state: %i\n", keynames[i].name.c_str(), keys[i].pressed);
     }
     printf("mouse|X: %i, Y: %i|\n", mouseXPos, mouseYPos);
     //printf("|-----|\n");

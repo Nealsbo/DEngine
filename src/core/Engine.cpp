@@ -62,7 +62,7 @@ void DEngine::Init() {
 		Shutdown();
 	}
 
-	result = scene->Init();
+	result = scene->Init(input);
 	if(result) {
 		Log::Msg("Scene init failed", LOG_LEVEL::ERROR);
 		Shutdown();

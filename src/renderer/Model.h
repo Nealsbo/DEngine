@@ -8,6 +8,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Light.h"
+#include "Material.h"
 
 #include "../../ext/tiny_gltf.h"
 
@@ -33,6 +34,9 @@ public:
     glm::vec3 GetRotation();
     glm::vec3 GetScale();
 
+    void SetMaterial(DMaterial *mat);
+    void ApplyMaterial();
+
     void LoadModel(const std::string &fileName);
     std::pair<GLuint, std::map<int, GLuint>> SetupModel();
     void SetupModelNodes(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Node &node);
@@ -44,6 +48,8 @@ private:
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
+
+    DMaterial *material;
 
     DShader * shader;
     DMesh * mesh;

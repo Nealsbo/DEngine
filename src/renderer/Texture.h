@@ -2,6 +2,13 @@
 
 #include <glad/glad.h>
 
+enum E_TEXTURE_TYPE{
+    DIFFUSE = 1,
+    NORMAL,
+    SPECULAR,
+    LIGHTMAP
+};
+
 class DTexture {
 public:
     DTexture();
@@ -18,4 +25,5 @@ public:
     unsigned int Wrap_T;
     unsigned int Filter_Min;
     unsigned int Filter_Max;
+    unsigned int type;
 };

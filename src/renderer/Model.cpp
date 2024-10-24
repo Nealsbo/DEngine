@@ -64,13 +64,25 @@ glm::vec3 DModel::GetScale() {
     return scale;
 }
 
+void DModel::SetMaterial(DMaterial *mat) {
+    material = mat;
+}
+
+void DModel::ApplyMaterial() {
+    if(material->isSpecular) {
+        shader->SetFloat("material.specular", material->shininess);
+        shader->SetFloat("material.shininess", 64.0f);
+    }
+}
 
 void DModel::Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *light) {
     glm::mat4 projectionm = glm::perspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
     glm::mat4 viewm = camMat;
     glm::mat4 modelm = glm::mat4(1.0f);
+    modelm = glm::translate(modelm, position);
+    modelm = glm::scale(modelm, scale);
     //modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 mvp = projectionm * viewm * modelm;
+    //glm::mat4 mvp = projectionm * viewm * modelm;
 
     shader->Use();
     //shader->SetMat4("MVP", mvp);

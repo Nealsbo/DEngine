@@ -52,6 +52,7 @@ set(src_core
     src/renderer/Mesh.cpp
     src/renderer/Model.cpp
     src/renderer/Light.cpp
+    src/renderer/Material.cpp
     #src/renderer/Quad.cpp
 )
 

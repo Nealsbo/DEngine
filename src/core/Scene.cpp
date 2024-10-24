@@ -1,10 +1,13 @@
 #include "Scene.h"
 
+#include "cmath"
+
 DScene::DScene() {}
 
 DScene::~DScene() {}
 
-int DScene::Init() {
+int DScene::Init(DInputHandler *in) {
+    input = in;
     main_camera = new DCamera();
     return 0;
 }
@@ -70,10 +73,28 @@ void DScene::AddModel(const std::string& model_name) {
 void DScene::Update(float delta) {
     sceneTime += delta;
 
-    glm::vec3 lpos = glm::vec3(2.0f * std::sinf(sceneTime / 500.0f), 3.0f, 2.0f * std::cosf(sceneTime / 500.0f));
+    glm::vec3 lpos = glm::vec3(2.0f * std::sin(sceneTime / 500.0f), 3.0f, 2.0f * std::cos(sceneTime / 500.0f));
     //glm::vec3 rot = glm::vec3(0.0f, 0.05f * delta, 0.0f);
 
     point_lights[0]->SetPosition(lpos);
+
+    glm::vec3 camMove(0.0, 0.0, 0.0);
+    float camMoveSpeed = main_camera->GetSpeed() * delta / 1000.0f;
+
+    if(input->IsKeyDown(KEY_W)) {
+        camMove.z += -camMoveSpeed;
+    }
+    if(input->IsKeyDown(KEY_S)) {
+        camMove.z += camMoveSpeed;
+    }
+    if(input->IsKeyDown(KEY_A)) {
+        camMove.x += -camMoveSpeed;
+    }
+    if(input->IsKeyDown(KEY_D)) {
+        camMove.x += camMoveSpeed;
+    }
+    
+    main_camera->AddPosition(camMove);
 }
 
 void DScene::PrintSceneInfo() {
