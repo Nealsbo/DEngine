@@ -78,23 +78,28 @@ void DScene::Update(float delta) {
 
     point_lights[0]->SetPosition(lpos);
 
-    glm::vec3 camMove(0.0, 0.0, 0.0);
-    float camMoveSpeed = main_camera->GetSpeed() * delta / 1000.0f;
+    int camMoveForward = 0;
+    int camMoveRight = 0;
 
+    float mousex = (float)input->GetMouseXOffset() * delta / 10.0f;
+    float mousey = (float)input->GetMouseYOffset() * delta / 10.0f;
+
+    main_camera->ProcessMouse(mousex, mousey, true);
+    
     if(input->IsKeyDown(KEY_W)) {
-        camMove.z += -camMoveSpeed;
+        camMoveForward++;
     }
     if(input->IsKeyDown(KEY_S)) {
-        camMove.z += camMoveSpeed;
-    }
-    if(input->IsKeyDown(KEY_A)) {
-        camMove.x += -camMoveSpeed;
+        camMoveForward--;
     }
     if(input->IsKeyDown(KEY_D)) {
-        camMove.x += camMoveSpeed;
+        camMoveRight++;
+    }
+    if(input->IsKeyDown(KEY_A)) {
+        camMoveRight--;
     }
     
-    main_camera->AddPosition(camMove);
+    main_camera->Move(camMoveForward, camMoveRight, delta / 1000.0f);
 }
 
 void DScene::PrintSceneInfo() {

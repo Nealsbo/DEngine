@@ -6,7 +6,7 @@
 
 const float YAW         = -90.0f;
 const float PITCH       =  0.0f;
-const float CAM_SPEED   =  2.5f;
+const float CAM_SPEED   =  4.0f;
 const float CAM_SENS    =  0.1f;
 const float DEF_FOV     =  60.0f;
 
@@ -18,6 +18,8 @@ public:
     void SetPosition(glm::vec3 &new_position);
     void AddPosition(glm::vec3 &new_position);
     glm::vec3 GetPosition();
+
+    void Move(int forward, int right, float delta);
 
     void SetSpeed(float cam_speed);
     float GetSpeed();

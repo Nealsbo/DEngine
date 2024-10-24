@@ -55,6 +55,9 @@ void DInputHandler::Shutdown() {
 }
 
 void DInputHandler::Update() {
+    mousexOffset = 0;
+    mouseyOffset = 0;
+
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
         switch(event.type) {
@@ -71,7 +74,10 @@ void DInputHandler::Update() {
                 break;
 
             case SDL_MOUSEMOTION:
-                SDL_GetMouseState( &mouseXPos, &mouseYPos );
+                mousexOffset = event.motion.xrel;
+                mouseyOffset = event.motion.yrel;
+                mouseXPos = event.motion.x;
+                mouseYPos = event.motion.y;
                 break;
 
             default:
@@ -97,7 +103,7 @@ int DInputHandler::GetMouseXOffset() {
     return mousexOffset;
 }
 int DInputHandler::GetMouseYOffset() {
-    return mouseyOffset;
+    return -mouseyOffset;
 }
 
 bool DInputHandler::IsKeyDown(int key) {
