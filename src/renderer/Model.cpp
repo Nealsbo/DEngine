@@ -81,7 +81,9 @@ void DModel::Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *ligh
     glm::mat4 modelm = glm::mat4(1.0f);
     modelm = glm::translate(modelm, position);
     modelm = glm::scale(modelm, scale);
-    //modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelm = glm::rotate(modelm, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    modelm = glm::rotate(modelm, glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
     //glm::mat4 mvp = projectionm * viewm * modelm;
 
     shader->Use();
@@ -146,8 +148,8 @@ void DModel::LoadModel(const std::string &fileName) {
         printf("Failed to parse glTF\n");
     }
 
-    PrintModel();
     VAO_and_EBOs = SetupModel();
+    PrintModel();
 }
 
 std::pair<GLuint, std::map<int, GLuint>> DModel::SetupModel() {
@@ -159,6 +161,23 @@ std::pair<GLuint, std::map<int, GLuint>> DModel::SetupModel() {
 
     //create an ebo for each node in the scene
     const tinygltf::Scene& scene = model.scenes[model.defaultScene];
+
+    std::vector<double> &pos = model.nodes[scene.nodes[0]].translation;
+    if(pos.size()) {
+        position = glm::vec3(pos[0], pos[1], pos[2]);
+    }
+
+    std::vector<double> &rot = model.nodes[scene.nodes[0]].rotation;
+    if(rot.size()) {
+        glm::quat rotq = glm::quat(rot[3], rot[0], rot[1], rot[2]);
+        rotation = glm::degrees(glm::eulerAngles(rotq));
+    }
+
+    std::vector<double> &sc = model.nodes[scene.nodes[0]].scale;
+    if(sc.size()) {
+        scale = glm::vec3(sc[0], sc[1], sc[2]);
+    }
+
     for (size_t i = 0; i < scene.nodes.size(); ++i) {
         assert((scene.nodes[i] >= 0) && (scene.nodes[i] < (int)model.nodes.size()));
         SetupModelNodes(ebos, model, model.nodes[scene.nodes[i]]);
@@ -290,8 +309,12 @@ void DModel::SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tiny
 }
 
 void DModel::PrintModel() {
+    printf("=======\n-------Model info:-------\n");
+    printf("Model position: %0.3f, %0.3f, %0.3f\n", position.x, position.y, position.z);
+    printf("Model rotation: %0.3f, %0.3f, %0.3f\n", rotation.x, rotation.y, rotation.z);
+    printf("Model scale: %0.3f, %0.3f, %0.3f\n", scale.x, scale.y, scale.z);
     for (auto &mesh : model.meshes) {
-        std::cout << "mesh : " << mesh.name << std::endl;
+        printf("mesh : %s\n", mesh.name.c_str());
         for (auto &primitive : mesh.primitives) {
             const tinygltf::Accessor &indexAccessor = model.accessors[primitive.indices];
             printf("indexaccessor: count %lu, type %i\n", indexAccessor.count, indexAccessor.componentType);
@@ -314,4 +337,5 @@ void DModel::PrintModel() {
             }
         }
     }
+    printf("=======\n");
 }
