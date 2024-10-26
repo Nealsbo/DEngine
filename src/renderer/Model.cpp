@@ -17,6 +17,9 @@ DModel::~DModel() {
     if(shader)
         delete shader;
 
+    for (auto tex : textures)
+        delete tex;
+
     glDeleteVertexArrays(1, &VAO_and_EBOs.first);
     for (auto it = VAO_and_EBOs.second.cbegin(); it != VAO_and_EBOs.second.cend();) {
         glDeleteBuffers(1, &VAO_and_EBOs.second[it->first]);
@@ -102,7 +105,7 @@ void DModel::Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *ligh
     shader->SetFloat("material.shininess", 64.0f);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, TextureID);
+    glBindTexture(GL_TEXTURE_2D, textures[0]->ID);
 
     glBindVertexArray(VAO_and_EBOs.first);
 
@@ -264,45 +267,42 @@ void DModel::SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tiny
 
         if (model.textures.size() > 0) {
         // fixme: Use material's baseColor
-            tinygltf::Texture &tex = model.textures[0];
+            for(size_t i = 0; i < model.textures.size(); i++) {
 
-            if (tex.source > -1) {
+                tinygltf::Texture &tex = model.textures[i];
+                if (tex.source > -1) {
+                    DTexture *texture = new DTexture;
 
-                GLuint texid;
-                glGenTextures(1, &texid);
+                    tinygltf::Image &image = model.images[tex.source];
+                    texture->name = image.uri;
+                    printf("\n\n%s\n\n", texture->name.c_str());
 
-                tinygltf::Image &image = model.images[tex.source];
+                    GLenum format = GL_RGBA;
+                    if (image.component == 1) {
+                      format = GL_RED;
+                    } else if (image.component == 2) {
+                      format = GL_RG;
+                    } else if (image.component == 3) {
+                      format = GL_RGB;
+                    } else {
+                      // ???
+                    }
 
-                glBindTexture(GL_TEXTURE_2D, texid);
-                glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+                    GLenum type = GL_UNSIGNED_BYTE;
+                    if (image.bits == 8) {
+                      // ok
+                    } else if (image.bits == 16) {
+                      type = GL_UNSIGNED_SHORT;
+                    } else {
+                      // ???
+                    }
 
-                GLenum format = GL_RGBA;
+                    texture->Image_Format = format;
+                    texture->type = type;
 
-                if (image.component == 1) {
-                  format = GL_RED;
-                } else if (image.component == 2) {
-                  format = GL_RG;
-                } else if (image.component == 3) {
-                  format = GL_RGB;
-                } else {
-                  // ???
+                    texture->Generate(image.width, image.height, image.image.data());
+                    textures.push_back(texture);
                 }
-
-                GLenum type = GL_UNSIGNED_BYTE;
-                if (image.bits == 8) {
-                  // ok
-                } else if (image.bits == 16) {
-                  type = GL_UNSIGNED_SHORT;
-                } else {
-                  // ???
-                }
-
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, format, type, &image.image.at(0));
-                TextureID = texid;
             }
         }
     }
@@ -336,6 +336,10 @@ void DModel::PrintModel() {
                 printf("attribute : %s\n", attrib.first.c_str());
             }
         }
+    }
+
+    for (auto tex : textures) {
+        tex->PrintTexInfo();
     }
     printf("=======\n");
 }

@@ -35,7 +35,8 @@ void DScene::LoadDefaultScene() {
     scene_name = "Default scene";
     scene_filename = "Default scene";
 
-    std::string mdl = "../assets/glTF/Suzanne.gltf";
+    //std::string mdl = "../assets/glTF/Suzanne.gltf";
+    std::string mdl = "../assets/glTF2/DamagedHelmet.gltf";
 	AddModel(mdl);
 
     DLight *light1 = new DLight();

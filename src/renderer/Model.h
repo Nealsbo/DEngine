@@ -52,9 +52,9 @@ private:
 
     DMaterial *material;
 
-    DShader * shader;
-    DMesh * mesh;
-    DTexture * texture;
+    DShader   *shader;
+    DMesh     *mesh;
+    std::vector<DTexture *> textures;
 
     std::pair<unsigned int, std::map<int, unsigned int>> VAO_and_EBOs;
 	unsigned int TextureID;

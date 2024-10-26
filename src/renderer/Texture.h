@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include <string>
+
 enum E_TEXTURE_TYPE{
     DIFFUSE = 1,
     NORMAL,
@@ -17,6 +19,8 @@ public:
     void Generate(unsigned int width, unsigned int height, unsigned char* data);
     void Bind() const;
 
+    void PrintTexInfo();
+
     unsigned int ID;
     unsigned int Width, Height;
     unsigned int Internal_Format;
@@ -26,4 +30,6 @@ public:
     unsigned int Filter_Min;
     unsigned int Filter_Max;
     unsigned int type;
+
+    std::string name;
 };
