@@ -22,7 +22,7 @@ public:
     void DrawMesh(const std::map<int, GLuint>& ebos, tinygltf::Mesh& mesh);
     void DrawModelNodes(tinygltf::Node& node);
     void SetShader(DShader * _shader);
-    void SetTexture();
+    void CreateMaterial(DMaterial *mat);
 
     void AddPosition(glm::vec3 &pos);
     void AddRotation(glm::vec3 &rot);
@@ -35,8 +35,6 @@ public:
     glm::vec3 GetRotation();
     glm::vec3 GetScale();
 
-    void SetMaterial(DMaterial *mat);
-    void ApplyMaterial();
 
     void LoadModel(const std::string &fileName);
     std::pair<GLuint, std::map<int, GLuint>> SetupModel();

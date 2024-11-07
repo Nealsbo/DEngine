@@ -14,9 +14,6 @@ DModel::DModel() {
 }
 
 DModel::~DModel() {
-    if(shader)
-        delete shader;
-
     for (auto tex : textures)
         delete tex;
 
@@ -28,11 +25,7 @@ DModel::~DModel() {
 }
 
 void DModel::SetShader(DShader * _shader) {
-    shader = _shader;
-}
-
-void DModel::SetTexture() {
-
+    material->SetShader(_shader);
 }
 
 void DModel::AddPosition(glm::vec3 &pos) {
@@ -67,14 +60,15 @@ glm::vec3 DModel::GetScale() {
     return scale;
 }
 
-void DModel::SetMaterial(DMaterial *mat) {
-    material = mat;
-}
-
-void DModel::ApplyMaterial() {
-    if(material->isSpecular) {
-        shader->SetFloat("material.specular", material->shininess);
-        shader->SetFloat("material.shininess", 64.0f);
+void DModel::CreateMaterial(DMaterial *mat) {
+    if(mat != nullptr) {
+        material = mat;
+    }
+    else {
+        material = new DMaterial();
+        material->SetName("Standart Material");
+        DShader *_shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
+        material->SetShader(_shader);
     }
 }
 
@@ -89,23 +83,12 @@ void DModel::Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *ligh
     modelm = glm::rotate(modelm, glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
     //glm::mat4 mvp = projectionm * viewm * modelm;
 
-    shader->Use();
-    //shader->SetMat4("MVP", mvp);
-    shader->SetMat4("Proj", projectionm);
-    shader->SetMat4("View", viewm);
-    shader->SetMat4("Model", modelm);
-    shader->SetVec3("viewPos", camPos);
+    material->projection = projectionm;
+    material->view = viewm;
+    material->model = modelm;
+    material->camera_pos = camPos;
 
-    // light properties
-    shader->SetVec3("lightPos", light->GetPosition());
-    shader->SetVec3("lightColor", light->GetColor());
-
-    // material properties
-    shader->SetVec3("material.specular", 0.8f, 0.8f, 0.8f);
-    shader->SetFloat("material.shininess", 64.0f);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures[0]->ID);
+    material->ApplyMaterial(light);
 
     glBindVertexArray(VAO_and_EBOs.first);
 
@@ -151,6 +134,7 @@ void DModel::LoadModel(const std::string &fileName) {
         printf("Failed to parse glTF\n");
     }
 
+    CreateMaterial(nullptr);
     VAO_and_EBOs = SetupModel();
     PrintModel();
 }
@@ -275,7 +259,8 @@ void DModel::SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tiny
 
                     tinygltf::Image &image = model.images[tex.source];
                     texture->name = image.uri;
-                    printf("\n\n%s\n\n", texture->name.c_str());
+                    printf("\n%s\n", texture->name.c_str());
+                    printf("%s\n\n", model.materials[0].name.c_str());
 
                     GLenum format = GL_RGBA;
                     if (image.component == 1) {
@@ -301,7 +286,8 @@ void DModel::SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tiny
                     texture->type = type;
 
                     texture->Generate(image.width, image.height, image.image.data());
-                    textures.push_back(texture);
+                    material->SetTexture(texture->name, texture);
+                    //textures.push_back(texture);
                 }
             }
         }

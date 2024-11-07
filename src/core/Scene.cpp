@@ -66,8 +66,6 @@ void DScene::AddModel(DModel *model) {
 void DScene::AddModel(const std::string& model_name) {
     DModel *model = new DModel();
     model->LoadModel(model_name);
-    DShader *shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
-    model->SetShader(shader);
     scene_models.push_back(model);
 }
 

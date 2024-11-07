@@ -5,10 +5,11 @@
 #include <string>
 
 enum E_TEXTURE_TYPE{
-    DIFFUSE = 1,
-    NORMAL,
-    SPECULAR,
-    LIGHTMAP
+    ETT_DIFFUSE = 1,
+    ETT_NORMAL,
+    ETT_SPECULAR,
+    ETT_LIGHTMAP,
+    ETT_NONE
 };
 
 class DTexture {

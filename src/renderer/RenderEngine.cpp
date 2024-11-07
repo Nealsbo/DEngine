@@ -13,10 +13,6 @@
 std::string err;
 std::string warn;
 
-glm::mat4 projectionm;
-glm::mat4 viewm;
-glm::mat4 modelm;
-
 std::map<GLchar, Character> Characters;
 
 DRenderEngine::DRenderEngine() {}
