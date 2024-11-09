@@ -35,7 +35,7 @@ glm::vec3 DCamera::GetPosition() {
     return position;
 }
 
-void DCamera::Move(int forward_move, int right_move, float delta)
+void DCamera::Move(int forward_move, int right_move, int up_move, float delta)
 {
     if(forward_move > 0)
         position += front * delta * speed;
@@ -46,6 +46,11 @@ void DCamera::Move(int forward_move, int right_move, float delta)
         position += right * delta * speed;
     else if(right_move < 0)
         position -= right * delta * speed;
+    
+    if(up_move > 0)
+        position += up * delta * speed;
+    else if(up_move < 0)
+        position -= up * delta * speed;
 }
 
 void DCamera::SetSpeed(float cam_speed) {

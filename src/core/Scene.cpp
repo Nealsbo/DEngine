@@ -79,6 +79,7 @@ void DScene::Update(float delta) {
 
     int camMoveForward = 0;
     int camMoveRight = 0;
+    int camMoveUp = 0;
 
     float mousex = (float)input->GetMouseXOffset() * delta / 10.0f;
     float mousey = (float)input->GetMouseYOffset() * delta / 10.0f;
@@ -97,8 +98,14 @@ void DScene::Update(float delta) {
     if(input->IsKeyDown(KEY_A)) {
         camMoveRight--;
     }
+    if(input->IsKeyDown(KEY_SPACE)) {
+        camMoveUp++;
+    }
+    if(input->IsKeyDown(KEY_CTRL)) {
+        camMoveUp--;
+    }
     
-    main_camera->Move(camMoveForward, camMoveRight, delta / 1000.0f);
+    main_camera->Move(camMoveForward, camMoveRight, camMoveUp, delta / 1000.0f);
 }
 
 void DScene::PrintSceneInfo() {

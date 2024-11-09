@@ -18,8 +18,7 @@ public:
     void SetPosition(glm::vec3 &new_position);
     void AddPosition(glm::vec3 &new_position);
     glm::vec3 GetPosition();
-
-    void Move(int forward, int right, float delta);
+    void Move(int forward, int right, int up_move, float delta);
 
     void SetSpeed(float cam_speed);
     float GetSpeed();

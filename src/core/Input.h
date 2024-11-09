@@ -10,10 +10,23 @@ enum {
     KEY_A,
     KEY_S,
     KEY_D,
+    KEY_E,
+    KEY_F,
+    KEY_0,
+    KEY_1,
+    KEY_2,
+    KEY_3,
+    KEY_4,
+    KEY_5,
+    KEY_6,
+    KEY_7,
+    KEY_8,
+    KEY_9,
     KEY_SPACE,
     KEY_TAB,
     KEY_ESC,
     KEY_CTRL,
+    KEY_SHIFT,
     KEY_LASTKEY
 };
 
