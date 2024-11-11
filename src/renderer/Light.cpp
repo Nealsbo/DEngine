@@ -1,7 +1,10 @@
 #include "Light.h"
 
 DLight::DLight() {
-
+    static uint32_t light_id = 0;
+    char buff[32];
+    sprintf(buff, "%s_%i", "PointLight", ++light_id);
+    name = std::string(buff);
 }
 
 DLight::~DLight() {
@@ -39,7 +42,6 @@ glm::vec3 DLight::GetPosition() {
 glm::vec3 DLight::GetColor() {
     return color;
 }
-
 
 std::string DLight::GetName() {
     return name;

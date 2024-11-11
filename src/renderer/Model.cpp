@@ -11,16 +11,23 @@ DModel::DModel() {
     position = glm::vec3(0.0f);
     rotation = glm::vec3(0.0f);
     scale = glm::vec3(1.0f);
+    model_name = "Default Model";
+    isGLTFModel = false;
 }
 
 DModel::~DModel() {
     for (auto tex : textures)
         delete tex;
 
-    glDeleteVertexArrays(1, &VAO_and_EBOs.first);
-    for (auto it = VAO_and_EBOs.second.cbegin(); it != VAO_and_EBOs.second.cend();) {
-        glDeleteBuffers(1, &VAO_and_EBOs.second[it->first]);
-        VAO_and_EBOs.second.erase(it++);
+    if(isGLTFModel) {
+        glDeleteVertexArrays(1, &VAO_and_EBOs.first);
+        for (auto it = VAO_and_EBOs.second.cbegin(); it != VAO_and_EBOs.second.cend();) {
+            glDeleteBuffers(1, &VAO_and_EBOs.second[it->first]);
+            VAO_and_EBOs.second.erase(it++);
+        }
+    } else {
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
     }
 }
 
@@ -60,6 +67,10 @@ glm::vec3 DModel::GetScale() {
     return scale;
 }
 
+std::string& DModel::GetModelName() {
+    return model_name;
+}
+
 void DModel::CreateMaterial(DMaterial *mat) {
     if(mat != nullptr) {
         material = mat;
@@ -90,11 +101,16 @@ void DModel::Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *ligh
 
     material->ApplyMaterial(light);
 
-    glBindVertexArray(VAO_and_EBOs.first);
+    if(isGLTFModel) {
+        glBindVertexArray(VAO_and_EBOs.first);
 
-    const tinygltf::Scene& scene = model.scenes[model.defaultScene];
-    for (size_t i = 0; i < scene.nodes.size(); ++i) {
-        DrawModelNodes(model.nodes[scene.nodes[i]]);
+        const tinygltf::Scene& scene = model.scenes[model.defaultScene];
+        for (size_t i = 0; i < scene.nodes.size(); ++i) {
+            DrawModelNodes(model.nodes[scene.nodes[i]]);
+        }
+    } else {
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, verticesCount / 8);
     }
 
     glBindVertexArray(0);
@@ -120,6 +136,123 @@ void DModel::DrawModelNodes(tinygltf::Node& node) {
     }
 }
 
+void DModel::CreateQuadMesh() {
+    static uint32_t quad_id = 0;
+    char buff[32];
+    sprintf(buff, "%s_%i", "Quad", ++quad_id);
+    model_name = std::string(buff);
+
+    // positions, colors, texture coords
+    float vertices[] = {
+         0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
+        -0.5f,  0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f
+    };
+
+    verticesCount = sizeof(vertices);
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    // normal attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    // texture coord attribute
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    CreateMaterial(nullptr);
+    uint8_t dotTex[4] = {255, 255, 255, 255};
+    DTexture *tex = new DTexture();
+    tex->Generate(1, 1, dotTex);
+    material->SetTexture("Diffuse", tex);
+}
+
+void DModel::CreateCubeMesh() {
+    static uint32_t cube_id = 0;
+    char buff[32];
+    sprintf(buff, "%s_%i", "Cube", ++cube_id);
+    model_name = std::string(buff);
+
+    // fix direction on some faces
+    float vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f,  1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f,  0.0f,
+
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f,  1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  0.0f,
+
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+        -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f,  1.0f,
+
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+         0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+         0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
+    };
+
+    verticesCount = sizeof(vertices);
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindVertexArray(VAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);                       // position attribute
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));     // normal attribute
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));     // texture coord attribute
+    glEnableVertexAttribArray(2);
+
+    CreateMaterial(nullptr);
+    uint8_t dotTex[4] = {255, 0, 0, 255};
+    DTexture *tex = new DTexture();
+    tex->Generate(1, 1, dotTex);
+    material->SetTexture("Diffuse", tex);
+}
+
 void DModel::LoadModel(const std::string &fileName) {
     bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, fileName.c_str());
     if (!warn.empty()) {
@@ -133,6 +266,13 @@ void DModel::LoadModel(const std::string &fileName) {
     if (!ret) {
         printf("Failed to parse glTF\n");
     }
+
+    model_path = fileName;
+    
+    std::string split = model_path.substr(model_path.find_last_of('/') + 1);
+    model_name = split.substr(0, split.find_last_of('.'));
+
+    isGLTFModel = true;
 
     CreateMaterial(nullptr);
     VAO_and_EBOs = SetupModel();

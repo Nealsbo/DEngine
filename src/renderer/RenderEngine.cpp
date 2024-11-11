@@ -22,8 +22,9 @@ DRenderEngine::~DRenderEngine() {}
 int DRenderEngine::Init(DWindowManager * wm) {
     win = wm;
 
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glEnable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST); 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if(!LoadFont()) {

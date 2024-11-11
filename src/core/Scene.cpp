@@ -42,7 +42,6 @@ void DScene::LoadDefaultScene() {
     DLight *light1 = new DLight();
     glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
     glm::vec3 pos   = glm::vec3(0.0f, 3.0f, 0.0f);
-    light1->SetName("Light1");
     light1->SetColor(color);
     light1->SetPosition(pos);
 
@@ -65,7 +64,8 @@ void DScene::AddModel(DModel *model) {
 
 void DScene::AddModel(const std::string& model_name) {
     DModel *model = new DModel();
-    model->LoadModel(model_name);
+    model->CreateCubeMesh();
+    //model->LoadModel(model_name);
     scene_models.push_back(model);
 }
 
@@ -112,6 +112,13 @@ void DScene::PrintSceneInfo() {
     printf("Scene model count: %li\n", scene_models.size());
     for(const auto model: scene_models) {
         glm::vec3 model_pos = model->GetPosition();
+        std::string &model_name = model->GetModelName();
+        printf("| Model name: %s\n", model_name.c_str());
         printf("| Model pos: %0.3f, %0.3f, %0.3f\n", model_pos.x, model_pos.y, model_pos.z);
+    }
+
+    for(const auto light: point_lights) {
+        std::string &light_name = light->name;
+        printf("| Light name: %s\n", light_name.c_str());
     }
 }

@@ -56,37 +56,40 @@ scena:
 
 /*
 1:
-Render gltf; //done 1/1
+Render gltf; //done
 
 2:
 light, materials //done 1/2
 
 3:
-deferred render gltf, console
+multiple objects renderer, basic particles, shadows, scene loader
 
 4:
-multiple objects renderer / culling
+culling, deferred render gltf,
 
-5: Sponza, pbr, dynamic lighting, postprocess
-scene: objects, level materials, lightmap, light sources, volume, decals
+5: Sponza, pbr, dynamic lighting, postprocess, deferred render gltf
+scene: objects, lightmap?, light sources, volume, decals
 
 6:
 physics, level physics, player, particles, camera collision test
 
 7:
-animation, resource manager
+animation, resource manager, console
 
 8:
 ui, ui control, gui(im, div)
 
 9:
-scripting, profiler
+session, game related obj, scripting, profiler
 
 10:
 game modes
 
 11:
 grass, shaders, post process, env probs
+
+12:
+shader fx: dof. bloom, ao
 
 */
 

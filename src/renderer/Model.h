@@ -35,6 +35,10 @@ public:
     glm::vec3 GetRotation();
     glm::vec3 GetScale();
 
+    std::string& GetModelName();
+
+    void CreateQuadMesh();
+    void CreateCubeMesh();
 
     void LoadModel(const std::string &fileName);
     std::pair<GLuint, std::map<int, GLuint>> SetupModel();
@@ -54,6 +58,11 @@ private:
     DMesh     *mesh;
     std::vector<DTexture *> textures;
 
+    bool isGLTFModel;
+
+    unsigned int VBO, VAO, EBO;
+    uint32_t verticesCount;
+
     std::pair<unsigned int, std::map<int, unsigned int>> VAO_and_EBOs;
 	unsigned int TextureID;
 
@@ -61,6 +70,9 @@ private:
     tinygltf::TinyGLTF loader;
     std::string err;
     std::string warn;
+
+    std::string model_path;
+    std::string model_name;
 };
 
 #endif
