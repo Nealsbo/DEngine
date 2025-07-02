@@ -2,12 +2,13 @@
 #define _MATERIAL_H_
 
 #include <string>
-#include <map>
+#include <unordered_map>
 
 #include "Texture.h"
 #include "Shader.h"
 #include "Light.h"
 
+E_TEXTURE_TYPE GetTypeByString(const std::string& t_type);
 
 class DMaterial {
 public:
@@ -15,6 +16,9 @@ public:
     ~DMaterial();
 
     void SetTexture(const std::string& t_type, DTexture *texture);
+    void SetTextureDiffuse(DTexture *texture);
+    void SetTextureNormal(DTexture *texture);
+    void SetBaseColor(const glm::vec4& color);
     void SetShader(DShader *shader);
     void SetName(const std::string& new_name);
 
@@ -22,11 +26,14 @@ public:
 
     void ApplyMaterial(DLight *light);
 
-    //std::map<E_TEXTURE_TYPE, DTexture *> textures;
-    std::vector<DTexture *> textures;
-    DShader *shader;
-
+    std::unordered_map<E_TEXTURE_TYPE, DTexture *> textures;
     std::string material_name;
+
+    DTexture *diffuse;
+    DTexture *normal;
+
+    DShader *shader;
+    glm::vec4 base_color;
 
     glm::mat4 projection;
     glm::mat4 view;
@@ -37,6 +44,7 @@ public:
     bool  isSpecular;
     float specularity;
     float shininess;
+
 };
 
 #endif

@@ -173,10 +173,8 @@ void DModel::CreateQuadMesh() {
     glEnableVertexAttribArray(2);
 
     CreateMaterial(nullptr);
-    uint8_t dotTex[4] = {255, 255, 255, 255};
-    DTexture *tex = new DTexture();
-    tex->Generate(1, 1, dotTex);
-    material->SetTexture("Diffuse", tex);
+    DTexture *tex = DTexture::BlankTexture(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    material->SetTexture("diffuse", tex);
 }
 
 void DModel::CreateCubeMesh() {
@@ -247,10 +245,8 @@ void DModel::CreateCubeMesh() {
     glEnableVertexAttribArray(2);
 
     CreateMaterial(nullptr);
-    uint8_t dotTex[4] = {255, 0, 0, 255};
-    DTexture *tex = new DTexture();
-    tex->Generate(1, 1, dotTex);
-    material->SetTexture("Diffuse", tex);
+    DTexture *tex = DTexture::BlankTexture(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    material->SetTexture("diffuse", tex);
 }
 
 void DModel::LoadModel(const std::string &fileName) {

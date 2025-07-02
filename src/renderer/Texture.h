@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #include <string>
 
@@ -17,6 +18,10 @@ public:
     DTexture();
     ~DTexture();
 
+    static DTexture *BlankTexture();
+    static DTexture *BlankTexture(const glm::vec4& color);
+    static DTexture *BlankTexture(float r, float g, float b, float a);
+    
     void Generate(unsigned int width, unsigned int height, unsigned char* data);
     void Bind() const;
 

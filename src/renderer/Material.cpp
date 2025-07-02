@@ -10,8 +10,20 @@ DMaterial::~DMaterial() {
 }
 
 void DMaterial::SetTexture(const std::string& t_type, DTexture *texture) {
-    //textures[GetTypeByString(t_type)] = texture;
-    textures.push_back(texture);
+    textures[GetTypeByString(t_type)] = texture;
+    //textures.push_back(texture);
+}
+
+void DMaterial::SetTextureDiffuse(DTexture *texture) {
+    diffuse = texture;
+}
+
+void DMaterial::SetTextureNormal(DTexture *texture) {
+    normal = texture;
+}
+
+void DMaterial::SetBaseColor(const glm::vec4& color) {
+    base_color = color;
 }
 
 void DMaterial::SetShader(DShader *new_shader) {
@@ -45,8 +57,8 @@ void DMaterial::ApplyMaterial(DLight *light) {
     }
 
     glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, textures[ETT_DIFFUSE]->ID);
-    glBindTexture(GL_TEXTURE_2D, textures[0]->ID);
+    glBindTexture(GL_TEXTURE_2D, textures[ETT_DIFFUSE]->ID);
+    //glBindTexture(GL_TEXTURE_2D, diffuse->ID);
 }
 
 E_TEXTURE_TYPE GetTypeByString(const std::string& t_type) {

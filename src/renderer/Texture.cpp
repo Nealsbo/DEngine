@@ -19,6 +19,41 @@ DTexture::DTexture() {
 
 DTexture::~DTexture() {}
 
+DTexture *DTexture::BlankTexture() {
+    DTexture *tex = new DTexture();
+
+    uint8_t data[4] = {255, 255, 255, 255};
+    tex->Generate(1, 1, data);
+
+    return tex;
+}
+
+DTexture *DTexture::BlankTexture(const glm::vec4& color) {
+    DTexture *tex = new DTexture();
+
+    uint8_t data[4] =  {(uint8_t)(color.x * 255.0f),
+                        (uint8_t)(color.y * 255.0f),
+                        (uint8_t)(color.z * 255.0f),
+                        (uint8_t)(color.a * 255.0f)};
+
+    tex->Generate(1, 1, data);
+
+    return tex;
+}
+
+DTexture *DTexture::BlankTexture(float r, float g, float b, float a) {
+    DTexture *tex = new DTexture();
+
+    uint8_t data[4] =  {(uint8_t)(r * 255.0f),
+                        (uint8_t)(g * 255.0f),
+                        (uint8_t)(b * 255.0f),
+                        (uint8_t)(a * 255.0f)};
+
+    tex->Generate(1, 1, data);
+
+    return tex;
+}
+
 void DTexture::Generate(unsigned int width, unsigned int height, unsigned char* data) {
     this->Width  = width;
     this->Height = height;
