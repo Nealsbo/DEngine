@@ -1,5 +1,6 @@
 #include "Input.h"
 
+#include "imgui_impl_sdl2.h"
 #include <stdio.h>
 #include <array>
 #include <vector>
@@ -25,6 +26,9 @@ static const Keyname keynames[] = {
     {KEY_A,       "A"},
     {KEY_S,       "S"},
     {KEY_D,       "D"},
+    {KEY_LMB,     "LMB"},
+    {KEY_RMB,     "RMB"},
+    {KEY_MMB,     "MMB"},
     {KEY_SPACE,   "SPACE"},
     {KEY_TAB,     "TAB"},
     {KEY_ESC,     "ESC"},
@@ -34,8 +38,6 @@ static const Keyname keynames[] = {
 
 //keymap
 std::array<DKey, MAX_KEYS> keys; 
-
-
 
 /*
 === Input Handler part ===
@@ -60,6 +62,8 @@ void DInputHandler::Update() {
 
     SDL_Event event;
     while(SDL_PollEvent(&event)) {
+        ImGui_ImplSDL2_ProcessEvent(&event);
+        
         switch(event.type) {
             case SDL_QUIT:
                 isOnExitRequest = true;
@@ -78,6 +82,14 @@ void DInputHandler::Update() {
                 mouseyOffset = event.motion.yrel;
                 mouseXPos = event.motion.x;
                 mouseYPos = event.motion.y;
+                break;
+
+            case SDL_MOUSEBUTTONDOWN:
+                keys[keymap(event.button.button)].pressed = true;
+                break;
+
+            case SDL_MOUSEBUTTONUP:
+                keys[keymap(event.button.button)].pressed = false;
                 break;
 
             default:
@@ -163,6 +175,13 @@ int keymap(int key) {
         return KEY_8;
     case SDLK_9:
         return KEY_9;
+    //mouse keys
+    case SDL_BUTTON_LEFT:
+        return KEY_LMB;
+    case SDL_BUTTON_RIGHT:
+        return KEY_RMB;
+    case SDL_BUTTON_MIDDLE:
+        return KEY_MMB;
     //util keys
     case SDLK_SPACE:
         return KEY_SPACE;

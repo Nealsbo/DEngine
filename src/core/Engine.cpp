@@ -1,6 +1,9 @@
 #include "Engine.h"
 #include "Logger.h"
 
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_opengl3.h"
 
 extern bool isOnExitRequest;
 
@@ -14,6 +17,7 @@ float deltaTime2        = 0.001f;
 float totalTime         = 0.001f;
 float cappedDeltaTime   = 0.001f;
 
+bool show_test_window = true;
 
 void DEngine::PreInit(int argc, char** argv) {
     Log::Msg("Engine PreInit", LOG_LEVEL::INFO);
@@ -76,10 +80,26 @@ void DEngine::Init() {
 	} else {
 		scene->LoadScene(new_scene);
 	}
+
+	IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+    ImGui::StyleColorsDark();
+
+	const char* glsl_version = "#version 130";
+    ImGui_ImplSDL2_InitForOpenGL(windowManager->GetWindow(), windowManager->GetGLContext());
+    ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
 void DEngine::Shutdown() {
     Log::Msg("Engine Shutdown", LOG_LEVEL::INFO);
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 
 	if(scene) {
 		scene->Shutdown();
@@ -132,10 +152,28 @@ void DEngine::Frame() {
 		// Handle input
 		input->Update();
 
+		if(input->IsKeyDown(KEY_RMB)) {
+			windowManager->GrabMouse(true);
+		} else {
+			windowManager->GrabMouse(false);
+		}
+
 		// Game process update
 		// TODO Move update to dedicated instance/session
 		//session->Frame();
 		scene->Update(deltaTime);
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+
+		ImGui::NewFrame();
+		if (show_test_window) {
+            ImGui::Begin("Test window", &show_test_window);
+            ImGui::Text("Sample text");
+            if (ImGui::Button("Quit App"))
+                isOnExitRequest = true;
+            ImGui::End();
+        }
 
     	// Render update
 		renderer->DrawFrame(scene, deltaTime);

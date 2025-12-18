@@ -8,6 +8,9 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "imgui_impl_opengl3.h"
+#include "imgui.h"
+
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 std::string err;
@@ -51,6 +54,9 @@ void DRenderEngine::DrawFrame(DScene *scene, float delta) {
     avgFrameDelta[currentFrameDelta] = delta;
 
     DrawAvgFps();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     win->SwapBuffers();
 

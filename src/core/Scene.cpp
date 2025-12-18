@@ -84,7 +84,9 @@ void DScene::Update(float delta) {
     float mousex = (float)input->GetMouseXOffset() * delta / 10.0f;
     float mousey = (float)input->GetMouseYOffset() * delta / 10.0f;
 
-    main_camera->ProcessMouse(mousex, mousey, true);
+    if(input->IsKeyDown(KEY_RMB)) {
+        main_camera->ProcessMouse(mousex, mousey, true);
+    }
     
     if(input->IsKeyDown(KEY_W)) {
         camMoveForward++;

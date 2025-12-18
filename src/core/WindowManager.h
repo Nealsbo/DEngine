@@ -24,6 +24,7 @@ public:
 	int GrabMouse(bool val);
 
 	SDL_Window* GetWindow();
+	SDL_GLContext GetGLContext();
 
 private:
 	int InitGL();

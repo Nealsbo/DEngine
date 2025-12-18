@@ -34,6 +34,10 @@ SDL_Window* DWindowManager::GetWindow() {
 	return window;
 }
 
+SDL_GLContext DWindowManager::GetGLContext() {
+    return glContext;
+}
+
 glm::vec2 DWindowManager::GetMousePos() {
 	return glm::vec2(xoffset, yoffset);
 }

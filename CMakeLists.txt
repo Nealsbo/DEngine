@@ -13,6 +13,7 @@ endif()
 
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(EXT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/ext")
+set(IMGUI_DIR "${EXT_DIR}/imgui")
 
 project(dengine)
 
@@ -56,12 +57,23 @@ set(src_core
     #src/renderer/Quad.cpp
 )
 
+set(imgui_src
+    ext/imgui/imgui_demo.cpp
+    ext/imgui/imgui_draw.cpp
+    ext/imgui/imgui_impl_opengl3.cpp
+    ext/imgui/imgui_impl_sdl2.cpp
+    ext/imgui/imgui_tables.cpp
+    ext/imgui/imgui_widgets.cpp
+    ext/imgui/imgui.cpp
+)
+
 include_directories("src/core")
 include_directories("src/renderer")
 include_directories("${GLAD_DIR}/include")
+include_directories(${IMGUI_DIR})
 include_directories(${FREETYPE_INCLUDE_DIRS})
 
-add_executable(${CMAKE_PROJECT_NAME} ${src_core})
+add_executable(${CMAKE_PROJECT_NAME} ${src_core} ${imgui_src})
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME}
