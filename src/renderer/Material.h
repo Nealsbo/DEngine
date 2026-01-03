@@ -13,12 +13,17 @@ E_TEXTURE_TYPE GetTypeByString(const std::string& t_type);
 class DMaterial {
 public:
     DMaterial();
+    DMaterial(const std::string& mat_name);
     ~DMaterial();
 
     void SetTexture(const std::string& t_type, DTexture *texture);
-    void SetTextureDiffuse(DTexture *texture);
-    void SetTextureNormal(DTexture *texture);
+    void SetTexture(E_TEXTURE_TYPE t_type, DTexture *texture);
+    
     void SetBaseColor(const glm::vec4& color);
+    void SetEmissiveColor(const glm::vec4& color);
+    void SetMetalness(const float& value);
+    void SetRoughness(const float& value);
+    
     void SetShader(DShader *shader);
     void SetName(const std::string& new_name);
 
@@ -29,11 +34,19 @@ public:
     std::unordered_map<E_TEXTURE_TYPE, DTexture *> textures;
     std::string material_name;
 
-    DTexture *diffuse;
-    DTexture *normal;
+    DTexture *diffuse        = nullptr;
+    DTexture *normal         = nullptr;
+    DTexture *emissive       = nullptr;
+    DTexture *metalRoughness = nullptr;
+    DTexture *occlusion      = nullptr;
+    DTexture *specular       = nullptr;
 
-    DShader *shader;
-    glm::vec4 base_color;
+    DShader  *shader         = nullptr;
+
+    glm::vec4 baseColorValue = glm::vec4(1.0f);
+    glm::vec4 emissiveValue  = glm::vec4(0.0f);
+    float metalness          = 0.0f;
+    float roughness          = 0.0f;
 
     glm::mat4 projection;
     glm::mat4 view;

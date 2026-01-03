@@ -14,10 +14,10 @@ Transform::Transform(const Transform& tr) {
     matrix = tr.matrix;
 }
 
-void Transform::GetMatrix() {
+glm::mat4 Transform::GetMatrix() {
     matrix = glm::mat4(1.0f);
     matrix = glm::translate(matrix, position);
-    matrix = glm::rotate(matrix, angle_in_degrees, rotation);
+    matrix = glm::rotate(matrix, 1.0f, rotation);
     matrix = glm::scale(matrix, scale);
 
     return matrix;

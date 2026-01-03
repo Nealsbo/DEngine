@@ -19,7 +19,7 @@ public:
     ~DModel();
 
     void Draw(const glm::mat4& camMat, const glm::vec3& camPos, DLight *light);
-    void DrawMesh(const std::map<int, GLuint>& ebos, tinygltf::Mesh& mesh);
+    void DrawMesh(tinygltf::Mesh& mesh);
     void DrawModelNodes(tinygltf::Node& node);
     void SetShader(DShader * _shader);
     void CreateMaterial(DMaterial *mat);
@@ -41,9 +41,10 @@ public:
     void CreateCubeMesh();
 
     void LoadModel(const std::string &fileName);
-    std::pair<GLuint, std::map<int, GLuint>> SetupModel();
-    void SetupModelNodes(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Node &node);
-    void SetupMesh(std::map<int, GLuint>& ebos, tinygltf::Model &model, tinygltf::Mesh &mesh);
+    void SetupModel();
+    void SetupModelNodes(tinygltf::Model &model, tinygltf::Node &node);
+    void SetupMesh(tinygltf::Model &model, tinygltf::Mesh &mesh);
+    void SetupMaterials(tinygltf::Model &model);
 
     void PrintModel();
 
@@ -53,20 +54,16 @@ private:
     glm::vec3 scale;
 
     DMaterial *material;
-
     DShader   *shader;
     DMesh     *mesh;
+    
+    std::vector<DMesh *> meshes;
     std::vector<DTexture *> textures;
+    std::vector<DMaterial *>materials;
 
     bool isGLTFModel;
 
-    unsigned int VBO, VAO, EBO;
-    uint32_t verticesCount;
-
-    std::pair<unsigned int, std::map<int, unsigned int>> VAO_and_EBOs;
-	unsigned int TextureID;
-
-    tinygltf::Model model;
+    tinygltf::Model m_model;
     tinygltf::TinyGLTF loader;
     std::string err;
     std::string warn;

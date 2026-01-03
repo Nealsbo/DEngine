@@ -25,7 +25,6 @@ elseif(UNIX)
 endif()
 
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.3 REQUIRED)
 find_package(SDL2 REQUIRED)
 find_package(Freetype REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})

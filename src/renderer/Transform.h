@@ -10,10 +10,10 @@ public:
     Transform(const Transform& tr);
     ~Transform(){};
 
-    void GetMatrix();
+    glm::mat4 GetMatrix();
 
     glm::vec3 position;
     glm::vec3 rotation;
     glm::vec3 scale;
     glm::mat4 matrix;
-}
+};

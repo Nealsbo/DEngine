@@ -1,0 +1,2 @@
+#include "ResManager.h"
+

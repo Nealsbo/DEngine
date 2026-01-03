@@ -41,6 +41,6 @@ private:
 	DScene *         scene         = nullptr;
 
 	bool             isRunning     = true;
-	Uint32           frameCap      = 60;
+	Uint32           frameCap      = 750;
 };
 

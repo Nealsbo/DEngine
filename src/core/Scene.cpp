@@ -36,7 +36,8 @@ void DScene::LoadDefaultScene() {
     scene_filename = "Default scene";
 
     //std::string mdl = "../assets/glTF/Suzanne.gltf";
-    std::string mdl = "../assets/glTF2/DamagedHelmet.gltf";
+    //std::string mdl = "../assets/glTF2/DamagedHelmet.gltf";
+    std::string mdl = "../assets/sponza/Sponza.gltf";
 	AddModel(mdl);
 
     DLight *light1 = new DLight();
@@ -47,7 +48,7 @@ void DScene::LoadDefaultScene() {
 
     point_lights.push_back(light1);
 
-    PrintSceneInfo();
+    //PrintSceneInfo();
 }
 
 void DScene::SetMainCamera(DCamera *camera) {
@@ -64,8 +65,8 @@ void DScene::AddModel(DModel *model) {
 
 void DScene::AddModel(const std::string& model_name) {
     DModel *model = new DModel();
-    model->CreateCubeMesh();
-    //model->LoadModel(model_name);
+    //model->CreateCubeMesh();
+    model->LoadModel(model_name);
     scene_models.push_back(model);
 }
 

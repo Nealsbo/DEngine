@@ -4,26 +4,82 @@ DMaterial::DMaterial() {
     material_name = "Blank";
 }
 
+DMaterial::DMaterial(const std::string& mat_name) {
+    material_name = mat_name;
+    
+    if(mat_name == "BaseMaterial") {
+        DShader *_shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
+        SetShader(_shader);
+    }
+}
+
 DMaterial::~DMaterial() {
+    if(diffuse)
+        delete diffuse;
+    if(normal)
+        delete normal;
+    if(occlusion)
+        delete occlusion;
+    if(metalRoughness)
+        delete metalRoughness;
+    if(emissive)
+        delete emissive;
+    if(specular)
+        delete specular;
+
     if(shader)
         delete shader;
 }
 
+
 void DMaterial::SetTexture(const std::string& t_type, DTexture *texture) {
-    textures[GetTypeByString(t_type)] = texture;
+    SetTexture(GetTypeByString(t_type), texture);
+}
+
+void DMaterial::SetTexture(E_TEXTURE_TYPE t_type, DTexture *texture) {
+    //textures[GetTypeByString(t_type)] = texture;
+    switch(t_type) {
+        case ETT_DIFFUSE:
+            diffuse = texture;
+            break;
+        case ETT_NORMAL:
+            normal = texture;
+            break;
+        case ETT_EMISSIVE:
+            emissive = texture;
+            break;
+        case ETT_OCCLUSION:
+            occlusion = texture;
+            break;
+        case ETT_METALROUGH:
+            metalRoughness = texture;
+            break;
+        case ETT_SPECULAR:
+            specular = texture;
+            break;
+        case ETT_LIGHTMAP:
+            //TODO
+        case ETT_NONE:
+        default:
+            break;
+    }
     //textures.push_back(texture);
 }
 
-void DMaterial::SetTextureDiffuse(DTexture *texture) {
-    diffuse = texture;
-}
-
-void DMaterial::SetTextureNormal(DTexture *texture) {
-    normal = texture;
-}
-
 void DMaterial::SetBaseColor(const glm::vec4& color) {
-    base_color = color;
+    baseColorValue = color;
+}
+
+void DMaterial::SetEmissiveColor(const glm::vec4& color) {
+    emissiveValue = color;
+}
+
+void DMaterial::SetMetalness(const float& value) {
+    metalness = value;
+}
+
+void DMaterial::SetRoughness(const float& value) {
+    roughness = value;
 }
 
 void DMaterial::SetShader(DShader *new_shader) {
@@ -57,8 +113,8 @@ void DMaterial::ApplyMaterial(DLight *light) {
     }
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, textures[ETT_DIFFUSE]->ID);
-    //glBindTexture(GL_TEXTURE_2D, diffuse->ID);
+    //glBindTexture(GL_TEXTURE_2D, textures[ETT_DIFFUSE]->ID);
+    glBindTexture(GL_TEXTURE_2D, diffuse->ID);
 }
 
 E_TEXTURE_TYPE GetTypeByString(const std::string& t_type) {
@@ -68,6 +124,12 @@ E_TEXTURE_TYPE GetTypeByString(const std::string& t_type) {
         return ETT_NORMAL;
     if(t_type == "specular")
         return ETT_SPECULAR;
+    if(t_type == "occlusion")
+        return ETT_OCCLUSION;
+    if(t_type == "metalrough")
+        return ETT_METALROUGH;
+    if(t_type == "emissive")
+        return ETT_EMISSIVE;
     if(t_type == "lightmap")
         return ETT_LIGHTMAP;
     
