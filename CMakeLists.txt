@@ -45,6 +45,7 @@ set(src_core
     src/core/WindowManager.cpp
     src/core/Camera.cpp
     src/core/Scene.cpp
+    src/core/SceneLoader.cpp
 
     src/renderer/RenderEngine.cpp
     src/renderer/Texture.cpp
@@ -53,7 +54,7 @@ set(src_core
     src/renderer/Model.cpp
     src/renderer/Light.cpp
     src/renderer/Material.cpp
-    #src/renderer/Quad.cpp
+    src/renderer/GBuffer.cpp
 )
 
 set(imgui_src

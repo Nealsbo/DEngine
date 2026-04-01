@@ -45,4 +45,12 @@ public:
     float sceneTime;
 };
 
+class DSceneLoader {
+public:
+    static void LoadScene(const std::string& scene_name);
+    static void SaveScene(const std::string& scene_name);
+
+    static void LoadBSP(const std::string& scene_name);
+};
+
 #endif //_SCENE_

@@ -8,7 +8,8 @@ DMaterial::DMaterial(const std::string& mat_name) {
     material_name = mat_name;
     
     if(mat_name == "BaseMaterial") {
-        DShader *_shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
+        //DShader *_shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
+        DShader *_shader = new DShader("../assets/shaders/g_buffer.vs", "../assets/shaders/g_buffer.fs");
         SetShader(_shader);
     }
 }
@@ -103,14 +104,14 @@ void DMaterial::ApplyMaterial(DLight *light) {
     shader->SetVec3("viewPos", camera_pos);
 
     // light properties
-    shader->SetVec3("lightPos", light->GetPosition());
-    shader->SetVec3("lightColor", light->GetColor());
+    //shader->SetVec3("lightPos", light->GetPosition());
+    //shader->SetVec3("lightColor", light->GetColor());
 
     // material properties
-    if(isSpecular) {
-        shader->SetFloat("material.specular", shininess);
-        shader->SetFloat("material.shininess", 64.0f);
-    }
+    //if(isSpecular) {
+        //shader->SetFloat("material.specular", shininess);
+        //shader->SetFloat("material.shininess", 64.0f);
+    //}
 
     glActiveTexture(GL_TEXTURE0);
     //glBindTexture(GL_TEXTURE_2D, textures[ETT_DIFFUSE]->ID);

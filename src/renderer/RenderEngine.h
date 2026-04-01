@@ -3,6 +3,7 @@
 #include "../core/WindowManager.h"
 #include "../core/Scene.h"
 
+#include "GBuffer.h"
 #include "Shader.h"
 
 // counts average fps for given amount of frames
@@ -22,6 +23,11 @@ public:
 	void BeginFrame();
 	void EndFrame();
 
+	void GeometryPass();
+	void LightPass();
+
+	void RenderQuad();
+
 	bool LoadFont();
 	void RenderText(std::string text, float x, float y, float scale);
 	void PrintDebugMsg(const std::string& message);
@@ -33,6 +39,12 @@ private:
 	
 	DShader *textShader;
 	DCamera *camera;
+
+	DScene* worldScene;
+
+	DShader *lightPass;
+
+	GBuffer gBuffer;
 
 	char buffer[99999];
 	char text[16] = "helloworld";

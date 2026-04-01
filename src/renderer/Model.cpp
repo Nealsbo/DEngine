@@ -65,11 +65,11 @@ std::string& DModel::GetModelName() {
 void DModel::CreateMaterial(DMaterial *mat) {
     if(mat != nullptr) {
         material = mat;
-    }
-    else {
+    } else {
         material = new DMaterial("BaseMaterial");
         material->SetName("Standart Material");
-        DShader *_shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
+        //DShader *_shader = new DShader("../assets/shaders/base.vs", "../assets/shaders/base.fs");
+        DShader *_shader = new DShader("../assets/shaders/g_buffer.vs", "../assets/shaders/g_buffer.fs");
         material->SetShader(_shader);
     }
 }

@@ -13,6 +13,9 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
+unsigned int quadVBO;
+unsigned int quadVAO = 0;
+
 std::string err;
 std::string warn;
 
@@ -31,6 +34,11 @@ int DRenderEngine::Init(DWindowManager * wm) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDepthFunc(GL_LESS);
 
+    lightPass = new DShader("../assets/shaders/defered_shading.vs", "../assets/shaders/defered_shading.fs");
+    uint32_t w = wm->GetScreenWidth();
+    uint32_t h = wm->GetScreenHeight();
+    gBuffer.Init(w, h);
+
     if(!LoadFont()) {
         printf("ERROR: Font load failed!\n");
     }
@@ -39,17 +47,17 @@ int DRenderEngine::Init(DWindowManager * wm) {
 }
 
 void DRenderEngine::Shutdown() {
+    delete lightPass;
     delete textShader;
 }
 
 void DRenderEngine::DrawFrame(DScene *scene, float delta) {
     BeginFrame();
 
-    DCamera *mainCamera = scene->GetMainCamera();
+    worldScene = scene;
 
-    for(const auto& model: scene->scene_models) {
-        model->Draw(mainCamera->GetViewMatrix(), mainCamera->GetPosition(), scene->point_lights[0]);
-    }
+    GeometryPass();
+    LightPass();
 
     currentFrameDelta = (currentFrameDelta + 1) % deltaBufferSize;
     avgFrameDelta[currentFrameDelta] = delta;
@@ -66,12 +74,53 @@ void DRenderEngine::DrawFrame(DScene *scene, float delta) {
 
 void DRenderEngine::BeginFrame() {
     //start timer
-    glClearColor(0.3f, 0.0f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    //glClearColor(0.3f, 0.0f, 0.3f, 1.0f);
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void DRenderEngine::EndFrame() {
     //stop timer
+}
+
+void DRenderEngine::GeometryPass() {
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer.framebuf);
+    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    //gBuffer.Bind(false);
+
+    glEnable(GL_DEPTH_TEST);
+
+    glClearColor(0.3f, 0.0f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    auto view = worldScene->GetMainCamera()->GetViewMatrix();
+    auto pos = worldScene->GetMainCamera()->GetPosition();
+    for(const auto& model: worldScene->scene_models) {
+        model->Draw(view, pos, worldScene->point_lights[0]);
+    }
+}
+
+void DRenderEngine::LightPass() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    gBuffer.Bind(true);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gBuffer.positionTex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, gBuffer.normalTex);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, gBuffer.diffuseTex);
+    
+    lightPass->Use();
+    lightPass->SetInt("gPosition", 0);
+    lightPass->SetInt("gNormal", 1);
+    lightPass->SetInt("gDiffuse", 2);
+
+    lightPass->SetVec3("viewPos", worldScene->GetMainCamera()->GetPosition());
+    RenderQuad();
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 void DRenderEngine::DrawAvgFps() {
@@ -209,4 +258,31 @@ void DRenderEngine::RenderText(std::string text, float x, float y, float scale) 
     }
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void DRenderEngine::RenderQuad()
+{
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }

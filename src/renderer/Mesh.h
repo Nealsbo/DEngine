@@ -7,6 +7,7 @@
 
 #include "Texture.h"
 #include "Material.h"
+#include "GBuffer.h"
 
 
 
@@ -31,6 +32,7 @@ public:
     ~DMesh();
 
     void Draw(DLight* light);
+    void Draw(GBuffer& gBuf, DLight* light);
     DMaterial *material;
 
 private:

@@ -1,0 +1,8 @@
+{
+    "Object1": {
+        "name": "BaseObject",
+        "type": "Mesh",
+        "material": "BasicMaterial",
+        "position": [0.0,0.0,0.0] 
+    }
+}

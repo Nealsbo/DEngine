@@ -1,10 +1,12 @@
 #ifndef __LIGHT_H__
 #define __LIGHT_H__
 
+#include <string>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "../../ext/tiny_gltf.h"
+//#include "../../ext/tiny_gltf.h"
 
 class DLight {
 public:

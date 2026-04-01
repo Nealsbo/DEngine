@@ -42,7 +42,13 @@ int DConsole::ApplyCmd() {
 
 
 void DConsole::Draw() {
-
+    if (isActive) {
+        //ImGui::NewFrame();
+        //ImGui::Begin("Console", &isActive);
+        //ImGui::Text("Sample text");
+        //if (ImGui::Button("Quit App")) isOnExitRequest = true;
+        //ImGui::End();
+    }
 }
 
 void DConsole::SaveHistory() {

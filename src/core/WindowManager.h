@@ -26,6 +26,9 @@ public:
 	SDL_Window* GetWindow();
 	SDL_GLContext GetGLContext();
 
+	uint32_t GetScreenWidth() { return screenWidth; }
+	uint32_t GetScreenHeight() { return screenHeight; }
+
 private:
 	int InitGL();
 

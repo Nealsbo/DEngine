@@ -28,7 +28,9 @@ void DScene::LoadScene(const std::string& load_scene_name) {
     scene_name = load_scene_name;
     scene_filename = load_scene_name;
 
-    PrintSceneInfo();
+    DSceneLoader::LoadScene(scene_name);
+
+    //PrintSceneInfo();
 }
 
 void DScene::LoadDefaultScene() {
